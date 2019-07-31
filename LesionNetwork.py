@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 import nibabel as nib
+import seaborn as sns
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from nibabel.processing import resample_from_to
 
 # Yeo labels.
   # 0            NONE   0   0   0   0
@@ -16,6 +20,7 @@ import nibabel as nib
 patients = ['0902', 1105, 1692, 1809, 1830, 2092, 2105, 2552, 2697, 2781, 3049, 3184]
 df = pd.read_csv('/home/kahwang/bin/LesionNetwork/Neuropsych.csv')
 yeonetwork = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz').get_data()
+networks = ['V', 'SM', 'DA', 'CO', 'Lim', 'FP', 'DF']
 
 for p in patients:
 	fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_ttest_%s.nii.gz'  %p
@@ -25,5 +30,46 @@ for p in patients:
 	if p == '0902':
 		p=902
 
-	df.loc[df['Patient']==p, 'FPfc'] =  np.mean(fcmap[yeonetwork==6])
+	for i, n in enumerate(networks):
+		df.loc[df['Patient']==p, n] =  np.mean(fcmap[yeonetwork==i+1])
 
+for n in networks:
+	print(np.corrcoef(df[n], df['Trail Making B (seconds)']))
+
+
+p=sns.regplot(x='Trail Making B (seconds)', y = 'SM', data=df)
+
+df['Trail_B_Score'] = df['Trail Making B (seconds)']
+smf.ols(formula='Trail_B_Score ~ FP ', data=df).fit().summary()
+
+
+### Cortical Patients
+sdf = pd.DataFrame(columns=['Subject', 'Trail Score'])
+sdf['Subject'] = np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/subList_No_Epilepsy', dtype='str')
+sdf['Trail Score'] =np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Data/Score.txt')
+
+yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
+
+for i, s in enumerate(sdf['Subject']):
+	fn = '/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Masks/%s.nii.gz' %s
+	m = nib.load(fn)
+	res_m = resample_from_to(m, yeof)
+	masked_m = yeof.get_data() * res_m.get_data()
+
+	for p in patients:
+		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_ttest_%s.nii.gz'  %p
+		fcmap = nib.load(fcfile).get_data()[:,:,:,0,0]
+		sdf.loc[i, p] = np.sum(fcmap * masked_m)
+
+# rank 
+for p in patients:
+	sdf[str(p)+'_rank'] = sdf[p].rank()
+
+
+df.loc[11,'Patient'] = '0902'
+
+for i, p in enumerate(df['Patient']):
+	df.loc[i, 'Cortical_Patietnt_Score'] = sdf.loc[sdf[str(p)+'_rank']>508]['Trail Score'].mean()
+
+for i, p in enumerate(df['Patient']):
+	print(sdf.loc[sdf[str(p)+'_rank']>508]['Subject'])
