@@ -44,7 +44,7 @@ df['Trail_B_Score'] = df['Trail Making B (seconds)']
 smf.ols(formula='Trail_B_Score ~ FP ', data=df).fit().summary()
 
 
-### Cortical Patients
+### calculate thalamic patient's FCmap "load" within eac cortical patient lesion mask
 sdf = pd.DataFrame(columns=['Subject', 'Trail Score'])
 sdf['Subject'] = np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/subList_No_Epilepsy', dtype='str')
 sdf['Trail Score'] =np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Data/Score.txt')
@@ -62,7 +62,7 @@ for i, s in enumerate(sdf['Subject']):
 		fcmap = nib.load(fcfile).get_data()[:,:,:,0,0]
 		sdf.loc[i, p] = np.sum(fcmap * masked_m)
 
-# Rank Cortical Patients
+# Rank mask with fcmap overlap
 for p in patients:
 	sdf[str(p)+'_rank'] = sdf[p].rank()
 
@@ -77,9 +77,8 @@ for i, p in enumerate(df['Patient']):
 
 
 
-# Do spatial mask vin diagram calculation for cortical patients
+### calculate thalamic patient's FCmap overlap with lesion masks from cortical patients
 # t value t.266
-
 ### Cortical Patients
 sdf = pd.DataFrame(columns=['Subject', 'Trail Score'])
 sdf['Subject'] = np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/subList_No_Epilepsy', dtype='str')
@@ -93,7 +92,6 @@ for i, s in enumerate(sdf['Subject']):
 	res_m = resample_from_to(m, yeof).get_data()
 	yeo_m = yeof.get_data()>=1 
 	masked_m = yeo_m * res_m
-
 
 	for p in patients:
 		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_ttest_%s.nii.gz'  %p
@@ -119,6 +117,83 @@ for i, p in enumerate(df['Patient']):
 
 
 ### Sort cortical patients based on network partition
+
+### Cortical Patients
+sdf = pd.DataFrame(columns=['Subject', 'Trail Score'])
+sdf['Subject'] = np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/subList_No_Epilepsy', dtype='str')
+sdf['Trail Score'] =np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Data/Score.txt')
+networks = ['V', 'SM', 'DA', 'CO', 'Lim', 'FP', 'DF']
+yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
+
+for i, s in enumerate(sdf['Subject']):
+	fn = '/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Masks/%s.nii.gz' %s
+	m = nib.load(fn)
+	res_m = resample_from_to(m, yeof).get_data()
+	yeo_m = yeof.get_data()
+
+	for ii, n in enumerate(networks):
+
+		networkpartition = yeo_m == ii+1
+		overlap = res_m *networkpartition
+		sdf.loc[i, str(n) + '_overlap' ] = np.sum(overlap)#/np.sum(res_m) 
+
+for ii, n in enumerate(networks):
+	sdf[str(n) + '_overlap'+'_rank'] = sdf[str(n) + '_overlap'].rank()
+
+
+
+#### Create cortical patient data frame with score and lesion size
+sdf = pd.DataFrame(columns=['Subject', 'Trail Score'])
+sdf['Subject'] = np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/subList_No_Epilepsy', dtype='str')
+sdf['Trail Score'] =np.loadtxt('/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Data/Score.txt')
+
+for i, s in enumerate(sdf['Subject']):
+	fn = '/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Masks/%s.nii.gz' %s
+	m = nib.load(fn)
+
+	sdf.loc[i, 'Lesion Size'] = np.sum(m.get_data())
+
+
+# Do regression of lesion size on score. The r square is .34!
+
+results = sm.OLS(sdf['Trail Score'], sdf['Lesion Size']).fit()
+sdf['Adj Trail Score'] = results.resid 
+
+
+
+
+
+#biggest thalamus lesion size is 4469 mm3
+# 97 patients 
+# very little correlation between lesion size and performance in these 97 patients
+# in full 600 sample, there is a moderate correlation .18
+
+df = sdf[sdf['Lesion Size']<4500].copy().reset_index()
+networks = ['V', 'SM', 'DA', 'CO', 'Lim', 'FP', 'DF']
+yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
+for i, s in enumerate(df['Subject']):
+	fn = '/home/kahwang/Trail_making_part_B_LESYMAP/No_Epilepsy/Masks/%s.nii.gz' %s
+	m = nib.load(fn)
+	res_m = resample_from_to(m, yeof).get_data()
+	yeo_m = yeof.get_data()
+
+	for ii, n in enumerate(networks):
+
+		networkpartition = yeo_m == ii+1
+		overlap = res_m *networkpartition
+		df.loc[i, str(n) + '_overlap' ] = np.sum(overlap)#/np.sum(res_m) 
+
+for ii, n in enumerate(networks):
+	df[str(n) + '_overlap'+'_rank'] = df[str(n) + '_overlap'].rank()
+
+
+
+
+
+
+
+
+
 
 
 
