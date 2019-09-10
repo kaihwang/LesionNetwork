@@ -6,6 +6,7 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from nibabel.processing import resample_from_to
 import nilearn
+import scipy 
 
 def cal_tha_lesionFC():
 	''' Calcualte average FC for each lesion mask '''
