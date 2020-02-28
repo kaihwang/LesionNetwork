@@ -238,65 +238,228 @@ if __name__ == "__main__":
 
 
 	#### find control patients that have lesion size similar to thalamic lesion
-	sdf = load_corticalPatient_score_size()
-	sdf.to_csv('Cortical_Patients.csv')
+	# sdf = load_corticalPatient_score_size()
+	# sdf.to_csv('Cortical_Patients.csv')
 
-	yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
-	tha_morel = nib.load('/home/kahwang/ROI_for_share/morel_overlap_2mm.nii.gz')
-	mask_sum = np.zeros(yeof.get_data().shape)
+	# yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
+	# tha_morel = nib.load('/home/kahwang/ROI_for_share/morel_overlap_2mm.nii.gz')
+	# mask_sum = np.zeros(yeof.get_data().shape)
 	
-	# loading mask then sum them for display
-	for s in sdf[sdf['Lesion Size']<2536]['Subject'].values:
-		fn = '/home/kahwang/Lesion_Masks/%s.nii.gz' %s
-		m = nib.load(fn)
-		res_m = resample_from_to(m, yeof).get_data()
-		mask_sum = mask_sum + res_m
+	# # loading mask then sum them for display
+	# for s in sdf[sdf['Lesion Size']<2536]['Subject'].values:
+	# 	fn = '/home/kahwang/Lesion_Masks/%s.nii.gz' %s
+	# 	m = nib.load(fn)
+	# 	res_m = resample_from_to(m, yeof).get_data()
+	# 	mask_sum = mask_sum + res_m
 
-	# plot lesion locations	
-	mask_img = nilearn.image.new_img_like(yeof, mask_sum, copy_header=True)
-	nilearn.plotting.plot_glass_brain(mask_img)
-	nib.save(mask_img, '/home/kahwang/Tha_Lesion_Masks/SizeControlOverlap.nii')
+	# # plot lesion locations	
+	# mask_img = nilearn.image.new_img_like(yeof, mask_sum, copy_header=True)
+	# nilearn.plotting.plot_glass_brain(mask_img)
+	# nib.save(mask_img, '/home/kahwang/Tha_Lesion_Masks/SizeControlOverlap.nii')
 
 
 
-	#do test
+	# #do test
+	# df = pd.read_csv('Neuropsych.csv')
+	# # compare to control
+	# scipy.stats.mannwhitneyu(sdf.loc[sdf['Lesion Size']<2536]['Trail Score'].values, df[df['Group']=='Medial']['Trail Making B (seconds)'].values[0:-1])
+	# # compare between groups
+	# scipy.stats.mannwhitneyu(df[df['Group']=='Lateral']['Trail Making B (seconds)'].values, df[df['Group']=='Medial']['Trail Making B (seconds)'].values[0:-1])
+
+
+
+ # 	#find all lesions
+ # 	pdf = pd.DataFrame(columns=['Subject', 'Size'])
+ # 	pdf['Subject'] = np.loadtxt('/home/kahwang/Lesion_Masks/list', dtype='str')
+ # 	yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
+ # 	tha_morel = nib.load('/home/kahwang/ROI_for_share/morel_overlap_2mm.nii.gz').get_data()
+ # 	for i, s in enumerate(pdf['Subject']):
+		
+	# 	# load mask and get size
+	# 	fn = '/home/kahwang/Lesion_Masks/%s.nii.gz' %s
+	# 	m = nib.load(fn)
+	# 	pdf.loc[i, 'Size'] = np.sum(m.get_data())
+		
+	# 	#overlap with yeo network
+	# 	res_m = resample_from_to(m, yeof).get_data()
+	# 	yeo_m = yeof.get_data()
+
+	# 	for ii, n in enumerate(networks):
+	# 		networkpartition = yeo_m == ii+1
+	# 		overlap = res_m *networkpartition
+	# 		pdf.loc[i, str(n) + '_overlap' ] = np.sum(overlap)/ np.float(np.sum(networkpartition))
+
+	# 	#exclude patients with lesions that touches the thalamus	
+	# 	if np.sum(res_m*tha_morel)>0:  #if overlap with thalamus
+	# 		pdf = pdf.drop(pdf[pdf['Subject']==str(s)].index)			
+	
+	# 		#biggest thalamus lesion size is 2536 mm3
+	# 		# 60 patients 
+	# 		# very little correlation between lesion size and performance in these 60 patients
+	# 		# in full 600 sample, there is a moderate correlation .18	
+
+
+
+	#### Acount for lesion size and age 
 	df = pd.read_csv('Neuropsych.csv')
-	# compare to control
-	scipy.stats.mannwhitneyu(sdf.loc[sdf['Lesion Size']<2536]['Trail Score'].values, df[df['Group']=='Medial']['Trail Making B (seconds)'].values[0:-1])
-	# compare between groups
-	scipy.stats.mannwhitneyu(df[df['Group']=='Lateral']['Trail Making B (seconds)'].values, df[df['Group']=='Medial']['Trail Making B (seconds)'].values[0:-1])
 
 
+	## Norm data for TMT from 'Tombaugh et al
+	TMTA_norm ={
+	'24': {'mean': 22.93, 'sd': 6.87},
+	'34': {'mean': 24.40, 'sd': 8.71},
+	'44': {'mean': 28.54, 'sd': 10.09},
+	'54': {'mean': 31.78, 'sd': 9.93},
+	'59+': {'mean': 31.72, 'sd': 10.14},
+	'59-': {'mean': 35.10, 'sd': 10.94},
+	'64+': {'mean': 31.32, 'sd': 6.96},
+	'64-': {'mean': 33.22, 'sd': 9.10},
+	'69+': {'mean': 33.84, 'sd': 6.69},
+	'69-': {'mean': 39.14, 'sd': 11.84},
+	'74+': {'mean': 40.13, 'sd': 14.48},
+	'74-': {'mean': 42.47, 'sd': 15.15},
+	'79+': {'mean': 41.74, 'sd': 15.32},
+	'79-': {'mean': 50.81, 'sd': 17.44},
+	'84+': {'mean': 55.32, 'sd': 21.28},
+	'84-': {'mean': 58.19, 'sd': 23.31},
+	'89+': {'mean': 63.46, 'sd': 29.22},
+	'89-': {'mean': 57.56, 'sd': 21.54},
+	}
 
- 	#find all lesions
- 	pdf = pd.DataFrame(columns=['Subject', 'Size'])
- 	pdf['Subject'] = np.loadtxt('/home/kahwang/Lesion_Masks/list', dtype='str')
- 	yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
- 	tha_morel = nib.load('/home/kahwang/ROI_for_share/morel_overlap_2mm.nii.gz').get_data()
- 	for i, s in enumerate(pdf['Subject']):
+	TMTB_norm ={
+	'24': {'mean': 48.97, 'sd': 12.69},
+	'34': {'mean': 50.68 , 'sd': 12.36},
+	'44': {'mean': 58.46, 'sd': 16.41},
+	'54': {'mean': 63.76, 'sd': 14.42},
+	'59+': {'mean': 68.74 , 'sd': 21.02},
+	'59-': {'mean': 78.84 , 'sd': 19.09},
+	'64+': {'mean': 64.58, 'sd': 18.59},
+	'64-': {'mean': 74.55, 'sd': 19.55},
+	'69+': {'mean': 67.12, 'sd': 9.31},
+	'69-': {'mean': 91.32, 'sd': 28.8},
+	'74+': {'mean': 86.27, 'sd': 24.07},
+	'74-': {'mean': 109.95, 'sd': 35.15},
+	'79+': {'mean': 100.68, 'sd': 44.16},
+	'79-': {'mean': 130.61, 'sd': 45.74},
+	'84+': {'mean': 132.15, 'sd': 42.95},
+	'84-': {'mean': 152.74, 'sd': 65.68},
+	'89+': {'mean': 140.54, 'sd': 75.38},
+	'89-': {'mean': 167.69, 'sd': 78.50},
+	}
+
+
+	for i, s in enumerate(df['Sub']):
 		
+		#convert score
+		if df.loc[i, 'Age'] <= 34:
+			df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['34']['mean']) / TMTA_norm['34']['sd']
+		elif 34 < df.loc[i, 'Age'] <= 44:
+			df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['44']['mean']) / TMTA_norm['44']['sd']
+		elif 44 < df.loc[i, 'Age'] <= 54:
+			df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['54']['mean']) / TMTA_norm['54']['sd']		
+		
+		if (df.loc[i, 'Age'] > 54) & (df.loc[i, 'Educ'] <= 12):
+			if 54 < df.loc[i, 'Age'] <= 59:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['59-']['mean']) / TMTA_norm['59-']['sd']		
+			elif 59 < df.loc[i, 'Age'] <= 64:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['64-']['mean']) / TMTA_norm['64-']['sd']		
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['69-']['mean']) / TMTA_norm['69-']['sd']	
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['69-']['mean']) / TMTA_norm['69-']['sd']	
+			elif 69 < df.loc[i, 'Age'] <= 74:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['74-']['mean']) / TMTA_norm['74-']['sd']		
+			elif 74 < df.loc[i, 'Age'] <= 79:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['79-']['mean']) / TMTA_norm['79-']['sd']	
+			elif 79 < df.loc[i, 'Age'] <= 84:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['84-']['mean']) / TMTA_norm['84-']['sd']	
+			elif 84 < df.loc[i, 'Age'] <= 89:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['89-']['mean']) / TMTA_norm['89-']['sd']	
+
+		if (df.loc[i, 'Age'] > 54) & (df.loc[i, 'Educ'] > 12):
+			if 54 < df.loc[i, 'Age'] <= 59:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['59+']['mean']) / TMTA_norm['59+']['sd']		
+			elif 59 < df.loc[i, 'Age'] <= 64:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['64+']['mean']) / TMTA_norm['64+']['sd']		
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['69+']['mean']) / TMTA_norm['69+']['sd']	
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['69+']['mean']) / TMTA_norm['69+']['sd']	
+			elif 69 < df.loc[i, 'Age'] <= 74:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['74+']['mean']) / TMTA_norm['74+']['sd']		
+			elif 74 < df.loc[i, 'Age'] <= 79:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['79+']['mean']) / TMTA_norm['79+']['sd']	
+			elif 79 < df.loc[i, 'Age'] <= 84:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['84+']['mean']) / TMTA_norm['84+']['sd']	
+			elif 84 < df.loc[i, 'Age'] <= 89:
+				df.loc[i, 'TMTA_z'] = (df.loc[i, 'TMTA'] - TMTA_norm['89+']['mean']) / TMTA_norm['89+']['sd']	
+
+
+		if df.loc[i, 'Age'] <= 34:
+			df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['34']['mean']) / TMTB_norm['34']['sd']
+		elif 34 < df.loc[i, 'Age'] <= 44:
+			df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['44']['mean']) / TMTB_norm['44']['sd']
+		elif 44 < df.loc[i, 'Age'] <= 54:
+			df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['54']['mean']) / TMTB_norm['54']['sd']		
+		
+		if (df.loc[i, 'Age'] > 54) & (df.loc[i, 'Educ'] > 12):
+			if 54 < df.loc[i, 'Age'] <= 59:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['59+']['mean']) / TMTB_norm['59+']['sd']		
+			elif 59 < df.loc[i, 'Age'] <= 64:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['64+']['mean']) / TMTB_norm['64+']['sd']		
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['69+']['mean']) / TMTB_norm['69+']['sd']	
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['69+']['mean']) / TMTB_norm['69+']['sd']	
+			elif 69 < df.loc[i, 'Age'] <= 74:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['74+']['mean']) / TMTB_norm['74+']['sd']		
+			elif 74 < df.loc[i, 'Age'] <= 79:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['79+']['mean']) / TMTB_norm['79+']['sd']	
+			elif 79 < df.loc[i, 'Age'] <= 84:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['84+']['mean']) / TMTB_norm['84+']['sd']	
+			elif 84 < df.loc[i, 'Age'] <= 89:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['89+']['mean']) / TMTB_norm['89+']['sd']	
+
+		if (df.loc[i, 'Age'] > 54) & (df.loc[i, 'Educ'] <= 12):
+			if 54 < df.loc[i, 'Age'] <= 59:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['59-']['mean']) / TMTB_norm['59-']['sd']		
+			elif 59 < df.loc[i, 'Age'] <= 64:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['64-']['mean']) / TMTB_norm['64-']['sd']		
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['69-']['mean']) / TMTB_norm['69-']['sd']	
+			elif 64 < df.loc[i, 'Age'] <= 69:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['69-']['mean']) / TMTB_norm['69-']['sd']	
+			elif 69 < df.loc[i, 'Age'] <= 74:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['74-']['mean']) / TMTB_norm['74-']['sd']		
+			elif 74 < df.loc[i, 'Age'] <= 79:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['79-']['mean']) / TMTB_norm['79-']['sd']	
+			elif 79 < df.loc[i, 'Age'] <= 84:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['84-']['mean']) / TMTB_norm['84-']['sd']	
+			elif 84 < df.loc[i, 'Age'] <= 89:
+				df.loc[i, 'TMTB_z'] = (df.loc[i, 'TMTB'] - TMTB_norm['89-']['mean']) / TMTB_norm['89-']['sd']	
+
 		# load mask and get size
-		fn = '/home/kahwang/Lesion_Masks/%s.nii.gz' %s
-		m = nib.load(fn)
-		pdf.loc[i, 'Size'] = np.sum(m.get_data())
-		
-		#overlap with yeo network
-		res_m = resample_from_to(m, yeof).get_data()
-		yeo_m = yeof.get_data()
+		if s == '902':
+			s = '0902'
+		if s == '802':
+			s =='0802'
 
-		for ii, n in enumerate(networks):
-			networkpartition = yeo_m == ii+1
-			overlap = res_m *networkpartition
-			pdf.loc[i, str(n) + '_overlap' ] = np.sum(overlap)/ np.float(np.sum(networkpartition))
+		fn = '/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/%s.nii.gz' %s
+		try:
+			m = nib.load(fn)
+			df.loc[i, 'Lesion_Size'] = np.sum(m.get_data())
+		except:
+			continue	
 
-		#exclude patients with lesions that touches the thalamus	
-		if np.sum(res_m*tha_morel)>0:  #if overlap with thalamus
-			pdf = pdf.drop(pdf[pdf['Subject']==str(s)].index)			
-	
-			#biggest thalamus lesion size is 2536 mm3
-			# 60 patients 
-			# very little correlation between lesion size and performance in these 60 patients
-			# in full 600 sample, there is a moderate correlation .18	
+
+	model = smf.ols(formula='TMTB_z ~ Lesion_Size', data=df).fit()		
+
+	for i, s in enumerate(df['Sub']):
+		df.loc[i, 'TMTB_adj'] = df.loc[i, 'TMTB_z'] - (model.params['Lesion_Size']*df.loc[i, 'Lesion_Size'])
+
+
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_adj'].values, df.loc[df['Site']=='Th']['TMTB_adj'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values)	
 
 
 
