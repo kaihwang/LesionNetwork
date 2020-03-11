@@ -453,39 +453,44 @@ if __name__ == "__main__":
 
 	df['TMTB-A_z'] = df['TMTB_z'] - df['TMTA_z']
 
-	model = smf.ols(formula='TMTB-A_z ~ Lesion_Size + Age + Educ', data=df).fit()		
-
+	model = smf.ols(formula='TMTB-A_z ~ Lesion_Size', data=df).fit()		
+	model.summary()
 	for i, s in enumerate(df['Sub']):
 		df.loc[i, 'TMTB-A_adj'] = df.loc[i, 'TMTB-A_z'] - ((model.params['Lesion_Size']* df.loc[i, 'Lesion_Size']) +model.params['Intercept'])
-
+	
 			
-	model = smf.ols(formula='TMTB_z ~ Lesion_Size + Age + Educ', data=df).fit()		
-
+	model = smf.ols(formula='TMTB_z ~ Lesion_Size', data=df).fit()		
+	model.summary()
+	
 	for i, s in enumerate(df['Sub']):
 		df.loc[i, 'TMTB_adj'] = df.loc[i, 'TMTB_z'] - ((model.params['Lesion_Size']* df.loc[i, 'Lesion_Size']) +model.params['Intercept'])
 
-	model = smf.ols(formula='TMTA_z ~ Lesion_Size + Age + Educ', data=df).fit()		
+	model = smf.ols(formula='TMTA_z ~ Lesion_Size', data=df).fit()		
+	model.summary()
 
 	for i, s in enumerate(df['Sub']):
 		df.loc[i, 'TMTA_adj'] = df.loc[i, 'TMTA_z'] - ((model.params['Lesion_Size']* df.loc[i, 'Lesion_Size']) +model.params['Intercept'])
 
 	model = smf.ols(formula='PE ~ Lesion_Size + Age + Educ', data=df).fit()		
+	model.summary()
 
 	for i, s in enumerate(df['Sub']):
 		df.loc[i, 'PE_adj'] = df.loc[i, 'PE'] - ((model.params['Lesion_Size']* df.loc[i, 'Lesion_Size']) +(model.params['Educ']* df.loc[i, 'Educ']) +(model.params['Age']* df.loc[i, 'Age']) + model.params['Intercept'])		
 
 	model = smf.ols(formula='Boston ~ Lesion_Size + Age + Educ', data=df).fit()	
+	model.summary()
 
 	for i, s in enumerate(df['Sub']):
 		df.loc[i, 'Boston_adj'] = df.loc[i, 'Boston'] - ((model.params['Lesion_Size']* df.loc[i, 'Lesion_Size']) +(model.params['Educ']* df.loc[i, 'Educ']) +(model.params['Age']* df.loc[i, 'Age']) + model.params['Intercept'])		
 
 
 	df.to_csv('Neuropsych_adj.csv')	
-	#scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_adj'].values, df.loc[df['Site']=='Th']['TMTB_adj'].values)	
-	#scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB'].values, df.loc[df['Site']=='Th']['TMTB_z'].values)	
-
-
-
-
-
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_adj'].values, df.loc[df['Site']=='Th']['TMTB_adj'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTA_adj'].values, df.loc[df['Site']=='Th']['TMTA_adj'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE'].values, df.loc[df['Site']=='Th']['PE'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE_adj'].values, df.loc[df['Site']=='Th']['PE_adj'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Boston'].values, df.loc[df['Site']=='Th']['Boston'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Group']=='Medial Thalamus']['TMTB_adj'].values, df.loc[df['Group']=='Lateral Thalamus']['TMTB_adj'].values)	
 
