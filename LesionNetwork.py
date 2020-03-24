@@ -493,4 +493,4 @@ if __name__ == "__main__":
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE_adj'].values, df.loc[df['Site']=='Th']['PE_adj'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Boston'].values, df.loc[df['Site']=='Th']['Boston'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Group']=='Medial Thalamus']['TMTB_adj'].values, df.loc[df['Group']=='Lateral Thalamus']['TMTB_adj'].values)	
-
+	
