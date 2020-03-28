@@ -237,27 +237,6 @@ def rank_patient_lesion_based_on_FCNetworkOverlap():
 if __name__ == "__main__":
 
 
-	#### find control patients that have lesion size similar to thalamic lesion
-	# sdf = load_corticalPatient_score_size()
-	# sdf.to_csv('Cortical_Patients.csv')
-
-	# yeof = nib.load('/data/backed_up/shared/ROIs/Yeo7network_2mm.nii.gz')
-	# tha_morel = nib.load('/home/kahwang/ROI_for_share/morel_overlap_2mm.nii.gz')
-	# mask_sum = np.zeros(yeof.get_data().shape)
-	
-	# # loading mask then sum them for display
-	# for s in sdf[sdf['Lesion Size']<2536]['Subject'].values:
-	# 	fn = '/home/kahwang/Lesion_Masks/%s.nii.gz' %s
-	# 	m = nib.load(fn)
-	# 	res_m = resample_from_to(m, yeof).get_data()
-	# 	mask_sum = mask_sum + res_m
-
-	# # plot lesion locations	
-	# mask_img = nilearn.image.new_img_like(yeof, mask_sum, copy_header=True)
-	# nilearn.plotting.plot_glass_brain(mask_img)
-	# nib.save(mask_img, '/home/kahwang/Tha_Lesion_Masks/SizeControlOverlap.nii')
-
-
 
 	# #do test
 	# df = pd.read_csv('Neuropsych.csv')
@@ -298,6 +277,36 @@ if __name__ == "__main__":
 	# 		# very little correlation between lesion size and performance in these 60 patients
 	# 		# in full 600 sample, there is a moderate correlation .18	
 
+
+	### find control patients that have overlap with PFC
+	df = pd.read_csv('Comparison.csv')
+
+	tha_morel = nib.load('/home/kahwang/ROI_for_share/morel_overlap_2mm.nii.gz')
+	MNIPFC = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/MNIPFC.nii.gz')
+	
+	# loading mask then sum them for display
+	for i, s in enumerate(df['Subject']):
+		
+		# load mask and get size
+		if s == 802:
+			s='0802'
+		
+		fn = '/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/%s.nii.gz' %s
+		m = nib.load(fn)
+		overlap = MNIPFC.get_data() * m.get_data()
+
+		if i == 0:
+			mask_sum =  np.zeros(np.shape(m.get_data()))
+
+		if np.sum(overlap) == 0:
+			print(s)
+			mask_sum = mask_sum + m.get_data()
+
+
+	# plot lesion locations	
+	mask_img = nilearn.image.new_img_like(MNIPFC, mask_sum, copy_header=True)
+	#nilearn.plotting.plot_glass_brain(mask_img)
+	nib.save(mask_img, '/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/SizeControlOverlap.nii')
 
 
 	#### Acount for lesion size and age 
