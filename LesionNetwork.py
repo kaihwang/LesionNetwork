@@ -499,7 +499,6 @@ if __name__ == "__main__":
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE_adj'].values, df.loc[df['Site']=='Th']['PE_adj'].values)	
-	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Boston'].values, df.loc[df['Site']=='Th']['Boston'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Group']=='Medial Thalamus']['TMTB_adj'].values, df.loc[df['Group']=='Lateral Thalamus']['TMTB_adj'].values)	
 	
 
@@ -510,5 +509,18 @@ if __name__ == "__main__":
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Error'].values, df.loc[df['Site']=='Th']['Error'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE_response'].values, df.loc[df['Site']=='Th']['PE_response'].values)	
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Catogories'].values, df.loc[df['Site']=='Th']['Catogories'].values)	
+
+	#Control
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Boston'].values, df.loc[df['Site']=='Th']['Boston'].values)		
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['RAVL_Hit'].values, df.loc[df['Site']=='Th']['RAVL_Hit'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['RAVL_Rejection'].values, df.loc[df['Site']=='Th']['RAVL_Rejection'].values)	
+
+	#IQs
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['VIQ'].values, df.loc[df['Site']=='Th']['VIQ'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PIQ'].values, df.loc[df['Site']=='Th']['PIQ'].values)	
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['FSIQ'].values, df.loc[df['Site']=='Th']['FSIQ'].values)	
+
+
+
 
 
