@@ -34,9 +34,14 @@ p10 /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_1809.nii.gz[0]  \
 p11 /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_3184.nii.gz[0]  \
 p12 /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_CA018.nii.gz[0]  \
 p13 /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_CA041.nii.gz[0]  \
--prefix /data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/ttest_TMTB_MedvLatTHa 
+-prefix /data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/ttest_TMTB_impaired \
+-resid /data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/ttest_TMTB_impaired_resid.nii \
+-ACF
 
-#\
-#-resid /data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/ttest_TMTB_MedvLatTHa_resid \
+
+
+#3dClustSim -mask ttest_TMTB_impaired_resid.nii -acf 0.0890296 2.78616 12.4156
+
+
 #-Clustsim 16 \
 #-prefix_clustsim /data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/ttest_TMTB_MedvLatTHa_clustsim
