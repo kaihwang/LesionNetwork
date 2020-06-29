@@ -498,10 +498,14 @@ if __name__ == "__main__":
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTA_adj'].values, df.loc[df['Site']=='Th']['TMTA_adj'].values)
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values)
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB-A_z'].values, df.loc[df['Site']=='Th']['TMTB-A_z'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB-TMTA'].values, df.loc[df['Site']=='Th']['TMTB-TMTA'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['TMTB-A_adj'].values, df.loc[df['Site']=='Th']['TMTB-A_adj'].values)
+
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE_adj'].values, df.loc[df['Site']=='Th']['PE_adj'].values)
 	scipy.stats.mannwhitneyu(df.loc[df['Group']=='Medial Thalamus']['TMTB_adj'].values, df.loc[df['Group']=='Lateral Thalamus']['TMTB_adj'].values)
-
-
+	scipy.stats.mannwhitneyu(df.loc[df['Group']=='Medial Thalamus']['TMTB-TMTA'].values, df.loc[df['Group']=='Lateral Thalamus']['TMTB-TMTA'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['Group']=='Medial Thalamus']['TMTB-A_z'].values, df.loc[df['Group']=='Lateral Thalamus']['TMTB-A_z'].values)
 
 	#WCST tests
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PE'].values, df.loc[df['Site']=='Th']['PE'].values)
@@ -555,3 +559,9 @@ if __name__ == "__main__":
 			if s == '0902':
 				s = '902'
 			df.loc[df['Sub']==s, Morel[n]] = 8 * np.sum(m[morel_atlas==n])
+
+	#Contrast AN and Pu nuclei
+	scipy.stats.mannwhitneyu(df.loc[df['AN']>0]['TMTB_z'].values, df.loc[df['AN']==0]['TMTB_z'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['AN']>0]['TMTB-A_z'].values, df.loc[df['AN']==0]['TMTB-A_z'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['PuM']>0]['TMTB_z'].values, df.loc[df['PuM']==0]['TMTB_z'].values)
+	scipy.stats.mannwhitneyu(df.loc[df['PuM']>0]['TMTB-A_z'].values, df.loc[df['PuM']==0]['TMTB-A_z'].values)
