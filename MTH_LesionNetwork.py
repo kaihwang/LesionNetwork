@@ -565,3 +565,48 @@ if __name__ == "__main__":
 	scipy.stats.mannwhitneyu(df.loc[df['AN']>0]['TMTB-A_z'].values, df.loc[df['AN']==0]['TMTB-A_z'].values)
 	scipy.stats.mannwhitneyu(df.loc[df['PuM']>0]['TMTB_z'].values, df.loc[df['PuM']==0]['TMTB_z'].values)
 	scipy.stats.mannwhitneyu(df.loc[df['PuM']>0]['TMTB-A_z'].values, df.loc[df['PuM']==0]['TMTB-A_z'].values)
+
+
+	#Figure out the lesion location for comparison patients
+	#MNI atlas code:
+	#/opt/fsl/data/atlases/MNI/MNI-maxprob-thr25-2mm.nii.gz
+	# 3:Frontal
+	# 6:Parietal
+	# 8:Temporal
+	# 5:Occipital
+	# 7:Pallidum
+	# 1:Caudate
+	# 2: cerebellum
+	# 4: insula
+
+	WM_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/WM_mask.nii.gz').get_data()
+	GM_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/GM_mask.nii.gz').get_data()
+	MNI_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/MNI-maxprob-thr25-1mm.nii.gz').get_data()
+
+	for s in df.loc[df['Site']=='ctx']['Sub']:
+
+		fn = '/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/%s.nii.gz' %s
+		m = nib.load(fn).get_data()
+
+
+		df.loc[df['Sub']==s,'Lesion Size'] = np.sum(m>0)
+		df.loc[df['Sub']==s,'WM Lesion Size'] = np.sum(WM_mask * m)
+		df.loc[df['Sub']==s,'GM Lesion Size'] = np.sum(GM_mask * m)
+		df.loc[df['Sub']==s,'Frontal Lesion Size'] = np.sum((MNI_mask==3) * m)
+		df.loc[df['Sub']==s,'Parietal Lesion Size'] = np.sum((MNI_mask==6) * m)
+		df.loc[df['Sub']==s,'Temporal Lesion Size'] = np.sum((MNI_mask==8) * m)
+		df.loc[df['Sub']==s,'Occipital Lesion Size'] = np.sum((MNI_mask==5) * m)
+		df.loc[df['Sub']==s,'Putamen Lesion Size'] = np.sum((MNI_mask==7) * m)
+		df.loc[df['Sub']==s,'Caudate Lesion Size'] = np.sum((MNI_mask==1) * m)
+		df.loc[df['Sub']==s,'Insula Lesion Size'] = np.sum((MNI_mask==4) * m)
+		df.loc[df['Sub']==s,'Cerebellum Lesion Size'] = np.sum((MNI_mask==2) * m)
+
+	df.loc[df['Putamen Lesion Size']>0]['TMTB'].mean()
+	df.loc[df['Putamen Lesion Size']>0]['TMTB'].mean()
+	df.loc[df['Site']=='ctx']['TMTB'].mean()
+	df.loc[df['Putamen Lesion Size']>0]['TMTB'].count()
+
+	#Do whatever I want here. Summary stats for comparison Patients
+	cdf = df.loc[df['Site']=='ctx']
+	cdf['BG Lesion Size'] = cdf['Putamen Lesion Size'] + cdf['Caudate Lesion Size']
+	cdf.loc[cdf['Cerebellum Lesion Size']>0].mean()
