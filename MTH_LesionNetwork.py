@@ -524,6 +524,8 @@ if __name__ == "__main__":
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['PIQ'].values, df.loc[df['Site']=='Th']['PIQ'].values)
 	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['FSIQ'].values, df.loc[df['Site']=='Th']['FSIQ'].values)
 
+	#Lesion Size
+	scipy.stats.mannwhitneyu(df.loc[df['Site']=='ctx']['Lesion Size'].values, df.loc[df['Site']=='Th']['Lesion Size'].values)
 
 	### Get the lesion size within AN, MD, Pu and other major nuclei
 
@@ -610,3 +612,5 @@ if __name__ == "__main__":
 	cdf = df.loc[df['Site']=='ctx']
 	cdf['BG Lesion Size'] = cdf['Putamen Lesion Size'] + cdf['Caudate Lesion Size']
 	cdf.loc[cdf['Cerebellum Lesion Size']>0].mean()
+
+	cdf.loc[cdf['Cerebellum Lesion Size']>0]['TMTB_z'].mean()
