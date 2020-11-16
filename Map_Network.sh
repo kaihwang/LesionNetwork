@@ -1,108 +1,5 @@
 #!/bin/bash
 
-#### Lesion overlap
-# Tha
-3dMean \
--sum \
--prefix /data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/Tha_overlap.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1692.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1809.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1830.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2105.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3049.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1105.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2781.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2092.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/0902.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3184.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA018.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA041.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA104.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA105.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2552.nii.gz
-
-
-3dMean \
--sum \
--prefix /data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/Tha_medial.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1830.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2105.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3049.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1105.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2781.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2092.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/0902.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3184.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA104.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA105.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2552.nii.gz
-
-
-3dMean \
--sum \
--prefix /data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/Tha_lateral.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1692.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1809.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3184.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA018.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/CA041.nii.gz
-
-### Cortical
-3dMean \
--sum \
--prefix /data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/Comparison_overlap.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2552.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/0802.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1078.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1354.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1362.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1416.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1563.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1598.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1652.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1671.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1681.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1734.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1814.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1861.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1915.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1991.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/1992.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2114.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2172.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2184.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2284.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2523.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2549.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2574.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2602.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2824.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2952.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/2961.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3009.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3062.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3078.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3094.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3116.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3125.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3128.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3151.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3191.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3353.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3465.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3564.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3582.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3610.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3627.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3799.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3857.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3862.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3868.nii.gz \
-/data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/3899.nii.gz
-
-
-
-
 ##### Lesion network mapping
 #Subjects=$(cat /data/backed_up/shared/Tha_Lesion_Mapping/Subject_List.txt)
 #NKI
@@ -110,14 +7,17 @@
 
 #0902 1105 1692 1809 1830 2092 2105 2552 2781 3049 3184 CA018 CA041 CA085 CA104 CA105 CA134
 for subject in $(cat /data/backed_up/shared/Tha_Lesion_Mapping/Subject_List.txt); do
- 
+
+  rm -rf /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/
 	mkdir /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/
-	
-	for mask in CA001; do	
+
+	for mask in 1692 1809 1830 2105 3049 1105 2781 2552 2092 0902 3184 ca018 ca041 ca104 ca105 ca085 ca093 4036 4032 4041 4045; do
+
+    rm /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz
 
 		3dresample -master /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
-		-inset /data/backed_up/kahwang/Tha_Neuropsych/Lesion_Masks/${mask}.nii.gz \
-		-prefix /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz 
+		-inset /home/kahwang/0.5mm/${mask}.nii.gz \
+		-prefix /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz
 
 		3dNetCorr -inset /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
 		-in_rois /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz \
@@ -126,18 +26,34 @@ for subject in $(cat /data/backed_up/shared/Tha_Lesion_Mapping/Subject_List.txt)
 		-prefix /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/seed_corr_${mask}
 
 
-		# 3dmaskave -q -mask /home/kahwang/Tha_Lesion_Masks/${mask}_2mm.nii.gz \
-		# 	/data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
-		# 	 > /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/${mask}_${subject}_TS.1D
-		
-		# 3dfim+ -input /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
-		# 	-ideal_file /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/${mask}_${subject}_TS.1D \
-		# 	-out 'Correlation' \
-		# 	-bucket /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/${mask}_${subject}_TS_fit.nii.gz \
-
-
 	done
 done
 
 
+#### group stats on lesion network
+for mask in 1692 1809 1830 2105 3049 1105 2781 2552 2092 0902 3184 ca018 ca041 ca104 ca105 ca085 ca093 4036 4032 4041 4045; do
 
+  rm /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_${mask}.nii.gz
+	3dttest++ \
+	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/0*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_001.nii.gz" \
+	-prefix /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_${mask}.nii.gz
+
+
+
+done
+
+
+
+
+#### Use Lesymaps as seed
+
+# TMTB_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz')
+# TMTB_LESYMAP_map = TMTB_LESYMAP.get_data()
+# BNT_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img.nii.gz')
+# BNT_LESYMAP_map = BNT_LESYMAP.get_data()
+# COWA_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img.nii.gz')
+# COWA_LESYMAP_map = COWA_LESYMAP.get_data()
+# COM_FIG_COPY_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img.nii.gz')
+# COM_FIG_COPY_LESYMAP_map = COM_FIG_COPY_LESYMAP.get_data()
+# COM_FIG_RECALL_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz')
+# COM_FIG_RECALL_LESYMAP_map = COM_FIG_RECALL_LESYMAP.get_data()

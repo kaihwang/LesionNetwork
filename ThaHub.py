@@ -10,13 +10,17 @@ from nibabel.processing import resample_from_to
 import nilearn
 import scipy
 
+
 # load data
 df = pd.read_csv('~/RDSS/tmp/data.csv')
 
 # remove acute patietns (chronicity < 3 months)
 df = df.loc[df['Chronicity']>2].reset_index()
 
+
+########################################################################
 # normalize neuropsych data to popluation norm
+########################################################################
 
 # Norms for TMT
 TMTA_norm ={
@@ -104,7 +108,7 @@ COWA_norm = {
 #   80-84   5.5 (3.3)
 #   85-     5.4 (2.7)
 
-RVLT_Delayed_Recall_norm = {
+RAVLT_Delayed_Recall_norm = {
 '59': {'mean': 10.4, 'sd': 3.1},
 '64': {'mean': 9.9 , 'sd': 3.1},
 '69': {'mean': 8.3, 'sd': 3.5},
@@ -114,8 +118,8 @@ RVLT_Delayed_Recall_norm = {
 '85': {'mean': 5.4 , 'sd': 2.7},
 }
 
-# RVLT  Recognition
-#   55-59   14 (1.3)
+# RAVLT  Recognition
+#   55-59   14.1 (1.3)
 #   60-64   13.9 (1.5)
 #   65-69   13.3 (2)
 #   70-74   12.7 (2.1)
@@ -123,8 +127,8 @@ RVLT_Delayed_Recall_norm = {
 #   80-84   12.3 (2.4)
 #   85-     12.3 (2.3)
 
-RVLT_Recognition_norm = {
-'59': {'mean': 14, 'sd': 1.3},
+RAVLT_Recognition_norm = {
+'59': {'mean': 14.1, 'sd': 1.3},
 '64': {'mean': 13.9 , 'sd': 1.5},
 '69': {'mean': 13.3, 'sd': 2},
 '74': {'mean': 12.7, 'sd': 2.1},
@@ -279,36 +283,36 @@ for i in df.index:
 	elif (df.loc[i, 'Sex'] == 'F') & (15 < df.loc[i, 'Educ']):
 		df.loc[i, 'COWA_z'] = (df.loc[i, 'COWA'] - COWA_norm['F16']['mean']) / COWA_norm['F16']['sd']
 
-	#RVLT
+	#RAVLT
 	if df.loc[i, 'Age'] <= 59:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['59']['mean']) / RVLT_Delayed_Recall_norm['59']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['59']['mean']) / RAVLT_Delayed_Recall_norm['59']['sd']
 	elif 59 < df.loc[i, 'Age'] <= 64:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['64']['mean']) / RVLT_Delayed_Recall_norm['64']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['64']['mean']) / RAVLT_Delayed_Recall_norm['64']['sd']
 	elif 64 < df.loc[i, 'Age'] <= 69:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['69']['mean']) / RVLT_Delayed_Recall_norm['69']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['69']['mean']) / RAVLT_Delayed_Recall_norm['69']['sd']
 	elif 69 < df.loc[i, 'Age'] <= 74:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['74']['mean']) / RVLT_Delayed_Recall_norm['74']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['74']['mean']) / RAVLT_Delayed_Recall_norm['74']['sd']
 	elif 74 < df.loc[i, 'Age'] <= 79:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['79']['mean']) / RVLT_Delayed_Recall_norm['79']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['79']['mean']) / RAVLT_Delayed_Recall_norm['79']['sd']
 	elif 79 < df.loc[i, 'Age'] <= 84:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['84']['mean']) / RVLT_Delayed_Recall_norm['84']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['84']['mean']) / RAVLT_Delayed_Recall_norm['84']['sd']
 	elif 84 < df.loc[i, 'Age']:
-		df.loc[i, 'RVLT_Delayed_Recall_z'] = (df.loc[i, 'RVLT_Delayed_Recall'] - RVLT_Delayed_Recall_norm['85']['mean']) / RVLT_Delayed_Recall_norm['85']['sd']
+		df.loc[i, 'RAVLT_Delayed_Recall_z'] = (df.loc[i, 'RAVLT_Delayed_Recall'] - RAVLT_Delayed_Recall_norm['85']['mean']) / RAVLT_Delayed_Recall_norm['85']['sd']
 
 	if df.loc[i, 'Age'] <= 59:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['59']['mean']) / RVLT_Recognition_norm['59']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['59']['mean']) / RAVLT_Recognition_norm['59']['sd']
 	elif 59 < df.loc[i, 'Age'] <= 64:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['64']['mean']) / RVLT_Recognition_norm['64']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['64']['mean']) / RAVLT_Recognition_norm['64']['sd']
 	elif 64 < df.loc[i, 'Age'] <= 69:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['69']['mean']) / RVLT_Recognition_norm['69']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['69']['mean']) / RAVLT_Recognition_norm['69']['sd']
 	elif 69 < df.loc[i, 'Age'] <= 74:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['74']['mean']) / RVLT_Recognition_norm['74']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['74']['mean']) / RAVLT_Recognition_norm['74']['sd']
 	elif 74 < df.loc[i, 'Age'] <= 79:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['79']['mean']) / RVLT_Recognition_norm['79']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['79']['mean']) / RAVLT_Recognition_norm['79']['sd']
 	elif 79 < df.loc[i, 'Age'] <= 84:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['84']['mean']) / RVLT_Recognition_norm['84']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['84']['mean']) / RAVLT_Recognition_norm['84']['sd']
 	elif 84 < df.loc[i, 'Age']:
-		df.loc[i, 'RVLT_Recognition_z'] = (df.loc[i, 'RVLT_Hit'] - RVLT_Recognition_norm['85']['mean']) / RVLT_Recognition_norm['85']['sd']
+		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['85']['mean']) / RAVLT_Recognition_norm['85']['sd']
 
 	if df.loc[i, 'Age'] <= 40:
 		df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['40']['mean']) / Complex_Figure_Copy_norm['40']['sd']
@@ -333,3 +337,112 @@ for i in df.index:
 		df.loc[i, 'Complex_Figure_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['80']['mean']) / Complex_Figure_Recall_norm['80']['sd']
 
 df.to_csv('~/RDSS/tmp/data_z.csv')
+
+
+
+########################################################################
+# Calculate lesion size
+########################################################################
+
+for i in df.index:
+	# load mask and get size
+	s = df.loc[i, 'Sub']
+
+	# annoying zeros
+	if s == '902':
+		s = '0902'
+	if s == '802':
+		s = '0802'
+	try:
+		fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+		m = nib.load(fn)
+		df.loc[i, 'Lesion Size'] = np.sum(m.get_data()) * 0.125 #0.5 isotropic voxels, cubic = 0.125
+	except:
+		df.loc[i, 'Lesion Size'] = np.nan
+
+df.to_csv('~/RDSS/tmp/data_z.csv')
+
+
+
+########################################################################
+# Check comparison pateitns lesion overlap with LESYMAP results, select appropriate controls
+########################################################################
+
+# load Lesymap lesion sympton maps from various tasks
+TMTB_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz')
+TMTB_LESYMAP_map = TMTB_LESYMAP.get_data()
+BNT_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img.nii.gz')
+BNT_LESYMAP_map = BNT_LESYMAP.get_data()
+COWA_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img.nii.gz')
+COWA_LESYMAP_map = COWA_LESYMAP.get_data()
+COM_FIG_COPY_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img.nii.gz')
+COM_FIG_COPY_LESYMAP_map = COM_FIG_COPY_LESYMAP.get_data()
+COM_FIG_RECALL_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz')
+COM_FIG_RECALL_LESYMAP_map = COM_FIG_RECALL_LESYMAP.get_data()
+
+
+for i in df.index:
+	# load mask and get size
+	s = df.loc[i, 'Sub']
+
+	# annoying zeros
+	if s == '902':
+		s = '0902'
+	if s == '802':
+		s = '0802'
+	try:
+		fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+		m = nib.load(fn)
+		res_m = resample_from_to(m, TMTB_LESYMAP).get_data()
+
+		if np.sum(res_m*TMTB_LESYMAP_map)==0:
+			df.loc[i, 'TMTB_Comparison'] = True
+		else:
+			df.loc[i, 'TMTB_Comparison'] = False
+
+		if np.sum(res_m*BNT_LESYMAP_map)==0:
+			df.loc[i, 'BNT_Comparison'] = True
+		else:
+			df.loc[i, 'BNT_Comparison'] = False
+
+		if np.sum(res_m*COWA_LESYMAP_map)==0:
+			df.loc[i, 'COWA_Comparison'] = True
+		else:
+			df.loc[i, 'COWA_Comparison'] = False
+
+		if np.sum(res_m*COM_FIG_COPY_LESYMAP_map)==0:
+			df.loc[i, 'Complex_Figure_Copy_Comparison'] = True
+		else:
+			df.loc[i, 'Complex_Figure_Copy_Comparison'] = False
+
+		if np.sum(res_m*COM_FIG_RECALL_LESYMAP_map)==0:
+			df.loc[i, 'Complex_Figure_Recall_Comparison'] = True
+		else:
+			df.loc[i, 'Complex_Figure_Recall_Comparison'] = False
+
+	except:
+		continue
+
+df.to_csv('~/RDSS/tmp/data_z.csv')
+
+
+########################################################################
+# Compare test scores between patient groups
+########################################################################
+
+df = pd.read_csv('~/RDSS/tmp/data_z.csv')
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['BNT_Comparison']==True)]['BNT_z'].values, df.loc[df['Site']=='Th']['BNT_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['COWA_Comparison']==True)]['COWA_z'].values, df.loc[df['Site']=='Th']['COWA_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Delayed_Recall_z'].values, df.loc[df['Site']=='Th']['RAVLT_Delayed_Recall_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'].values, df.loc[df['Site']=='Th']['RAVLT_Recognition_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values)
+
+
+########################################################################
+# Run lesion network mapping, using lesion masks as seeds
+########################################################################
+# run Map_Network.sh
