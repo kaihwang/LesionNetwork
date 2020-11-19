@@ -443,6 +443,21 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall
 
 
 ########################################################################
+# Create table of impairment
+########################################################################
+
+df['TMTB_z_Impaired'] = df['TMTB_z'] >1
+df['BNT_z_Impaired'] = df['BNT_z'] <-1
+df['COWA_z_Impaired'] = df['COWA_z'] <-1
+df['RAVLT_Delayed_Recall_z_Impaired'] = df['RAVLT_Delayed_Recall_z'] <-1
+df['RAVLT_Recognition_z_Impaired'] = df['RAVLT_Recognition_z'] <-1
+df['Complex_Figure_Copy_z_Impaired'] = df['Complex_Figure_Copy_z'] <-1
+df['Complex_Figure_Recall_z_Impaired'] = df['Complex_Figure_Recall_z'] <-1
+
+df['MM_impaired'] = sum([df['TMTB_z_Impaired'] , df['BNT_z_Impaired'] , df['COWA_z_Impaired'] , df['RAVLT_Delayed_Recall_z_Impaired'] , df['RAVLT_Recognition_z_Impaired'] , df['Complex_Figure_Copy_z_Impaired'] , df['Complex_Figure_Recall_z_Impaired']])
+
+df.to_csv('~/RDSS/tmp/data_z.csv')
+########################################################################
 # Run lesion network mapping, using lesion masks as seeds
 ########################################################################
 # run Map_Network.sh
