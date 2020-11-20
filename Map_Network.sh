@@ -15,11 +15,11 @@ for subject in $(cat /data/backed_up/shared/Tha_Lesion_Mapping/Subject_List.txt)
 
     rm /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz
 
-		3dresample -master /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
+		3dresample -master /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400.nii.gz \
 		-inset /home/kahwang/0.5mm/${mask}.nii.gz \
 		-prefix /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz
 
-		3dNetCorr -inset /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
+		3dNetCorr -inset /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400.nii.gz \
 		-in_rois /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/rsmask_${mask}.nii.gz \
 		-nifti \
 		-ts_wb_Z \
@@ -38,11 +38,36 @@ for mask in 1692 1809 1830 2105 3049 1105 2781 2552 2092 0902 3184 ca018 ca041 c
 	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/0*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_001.nii.gz" \
 	-prefix /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_${mask}.nii.gz
 
+done
+
+# MGH
+for subject in $(cat /data/backed_up/shared/Tha_Lesion_Mapping/MGH_List_Bridged.txt); do
+
+  rm -rf /data/backed_up/shared/Tha_Lesion_Mapping/MGH_${subject}/
+	mkdir /data/backed_up/shared/Tha_Lesion_Mapping/MGH_${subject}/
+
+	for mask in 1692 1809 1830 2105 3049 1105 2781 2552 2092 0902 3184 ca018 ca041 ca104 ca105 ca085 ca093 4036 4032 4041 4045; do
+    #/data/backed_up/shared/MGH/MGH/Sub0200_Ses1/MNINonLinear
+		3dNetCorr -inset /data/backed_up/shared/MGH/MGH/${subject}/MNINonLinear/rfMRI_REST.nii.gz \
+		-in_rois /data/backed_up/shared/Tha_Lesion_Mapping/0197584_session_1/rsmask_${mask}.nii.gz \
+		-nifti \
+		-ts_wb_Z \
+		-prefix /data/backed_up/shared/Tha_Lesion_Mapping/MGH_${subject}/seed_corr_${mask}
 
 
+	done
 done
 
 
+#### group stats on lesion network
+for mask in 1692 1809 1830 2105 3049 1105 2781 2552 2092 0902 3184 ca018 ca041 ca104 ca105 ca085 ca093 4036 4032 4041 4045; do
+
+  rm /data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_${mask}.nii.gz
+	3dttest++ \
+	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_001.nii.gz" \
+	-prefix /data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_${mask}.nii.gz
+
+done
 
 
 #### Use Lesymaps as seed

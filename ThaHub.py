@@ -9,7 +9,7 @@ import statsmodels.formula.api as smf
 from nibabel.processing import resample_from_to
 import nilearn
 import scipy
-
+import os
 
 # load data
 df = pd.read_csv('~/RDSS/tmp/data.csv')
@@ -457,7 +457,132 @@ df['Complex_Figure_Recall_z_Impaired'] = df['Complex_Figure_Recall_z'] <-1
 df['MM_impaired'] = sum([df['TMTB_z_Impaired'] , df['BNT_z_Impaired'] , df['COWA_z_Impaired'] , df['RAVLT_Delayed_Recall_z_Impaired'] , df['RAVLT_Recognition_z_Impaired'] , df['Complex_Figure_Copy_z_Impaired'] , df['Complex_Figure_Recall_z_Impaired']])
 
 df.to_csv('~/RDSS/tmp/data_z.csv')
+
 ########################################################################
 # Run lesion network mapping, using lesion masks as seeds
 ########################################################################
 # run Map_Network.sh
+
+
+### Use tha lesion mask as seed, test if cortical FC differ between patients
+
+#resample LESYMAP output from 1mm grid to 2mm grid (FC maps in 2mm grid)
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/mni_icbm152_wm_tal_nlin_asym_09c_2mm.nii -prefix /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii")
+
+TMTB_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz').get_data()!=0
+BNT_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz').get_data()!=0
+COWA_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz').get_data()!=0
+COM_FIG_COPY_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz').get_data()!=0
+COM_FIG_RECALL_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz').get_data()!=0
+
+# use MNI 2mm template as base
+m = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz')
+#load WM atlas
+WM_atlas = nib.load('/home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii').get_data() > 0.5
+#WM_atlas = WM_atlas >0.5
+
+# TMTB_LESYMAP_map = resample_from_to(TMTB_LESYMAP, m).get_data()>0
+# BNT_LESYMAP_map = resample_from_to(BNT_LESYMAP, m).get_data()>0
+# COWA_LESYMAP_map = resample_from_to(COWA_LESYMAP, m).get_data()>0
+# COM_FIG_COPY_LESYMAP_map = resample_from_to(COM_FIG_COPY_LESYMAP, m).get_data()>0
+# COM_FIG_RECALL_LESYMAP_map = resample_from_to(COM_FIG_RECALL_LESYMAP, m).get_data()>0
+# from nilearn import plotting
+# plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=1)
+
+
+# get rid of WM
+TMTB_LESYMAP_map = 1* ((1 * TMTB_LESYMAP_map - 1 * WM_atlas) > 0)
+BNT_LESYMAP_map = 1* ((1 * BNT_LESYMAP_map - 1 * WM_atlas) > 0)
+COWA_LESYMAP_map = 1* ((1 * COWA_LESYMAP_map - 1 * WM_atlas) > 0)
+COM_FIG_COPY_LESYMAP_map = 1* ((1 * COM_FIG_COPY_LESYMAP_map - 1 * WM_atlas) > 0)
+COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas) > 0)
+#
+# a = nilearn.image.new_img_like(m, TMTB_LESYMAP_map, copy_header=True)
+# a.to_filename('test.nii')
+#plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=0.8)
+#plotting.show()
+
+for p in df.loc[df['Site'] == 'Th']['Sub'] :
+
+	if p == '4045':
+		continue #no mask yet
+	else:
+		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_groupFC_%s.nii.gz'  %p
+		fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
+
+		df.loc[df['Sub'] == p, 'TMTB_FC'] = np.mean(fcmap * TMTB_LESYMAP_map)
+		df.loc[df['Sub'] == p, 'BNT_FC'] = np.mean(fcmap * BNT_LESYMAP_map)
+		df.loc[df['Sub'] == p, 'COWA_FC'] = np.mean(fcmap * COWA_LESYMAP_map)
+		df.loc[df['Sub'] == p, 'COM_FIG_COPY_FC'] = np.mean(fcmap * COM_FIG_COPY_LESYMAP_map)
+		df.loc[df['Sub'] == p, 'COM_FIG_RECALL_FC'] = np.mean(fcmap * COM_FIG_RECALL_LESYMAP_map)
+
+print(df.groupby(['TMTB_z_Impaired'])['TMTB_FC'].mean())
+print(df.groupby(['BNT_z_Impaired'])['BNT_FC'].mean())
+print(df.groupby(['COWA_z_Impaired'])['COWA_FC'].mean())
+print(df.groupby(['Complex_Figure_Copy_z_Impaired'])['COM_FIG_COPY_FC'].mean())
+print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_FC'].mean())
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_FC'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_FC'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_FC'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_FC'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==True)]['COWA_FC'].values, df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==False)]['COWA_FC'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==True)]['COM_FIG_COPY_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==False)]['COM_FIG_COPY_FC'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_FC'].values)
+
+
+########################################################################
+# Calculate participation coef for each lesion mask,
+# Determine nuclei overlap for each lesion mask
+########################################################################
+
+PC_map = cmap = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/PC.nii.gz')
+#nuclei
+Morel = {
+1: 'AN',
+2: 'VM',
+3: 'VL',
+4: 'MGN',
+5: 'MD',
+6: 'PuA',
+7: 'LP',
+8: 'IL',
+9: 'VA',
+10: 'Po',
+11: 'LGN',
+12: 'PuM',
+13: 'PuI',
+14: 'PuL',
+17: 'VP'
+}
+morel_atlas = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
+
+for p in df.loc[df['Site'] == 'Th']['Sub'] :
+
+	if p == '4045':
+		continue #no mask yet
+
+	else:
+		#resample mask from .5 mm grid to 2 mm grid
+		cmd = "3dresample -master /data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/PC.nii.gz -inset /home/kahwang/0.5mm/%s.nii.gz -prefix /home/kahwang/0.5mm/%s_2mm.nii.gz" %(p, p)
+		os.system(cmd)
+
+		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+		lesion_mask = nib.load(fn)
+
+		df.loc[df['Sub']==p,'PC'] = np.mean(PC_map.get_data()[lesion_mask.get_data()>0])
+
+		for n in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17]:
+			df.loc[df['Sub']==p, Morel[n]] = 8 * np.sum(lesion_mask.get_data()[morel_atlas==n])
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['MM_impaired']>3)]['PC'].values, df.loc[(df['Site']=='Th') & (df['MM_impaired']<2)]['PC'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th')]['MM_impaired'].values, df.loc[(df['Site']=='ctx')]['MM_impaired'].values)
+
+
+
+
+
+df.to_csv('~/RDSS/tmp/data_z.csv')
