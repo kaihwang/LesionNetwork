@@ -512,7 +512,7 @@ for p in df.loc[df['Site'] == 'Th']['Sub'] :
 	if p == '4045':
 		continue #no mask yet
 	else:
-		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_groupFC_%s.nii.gz'  %p
+		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s.nii.gz'  %p
 		fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
 
 		df.loc[df['Sub'] == p, 'TMTB_FC'] = np.mean(fcmap * TMTB_LESYMAP_map)
@@ -539,7 +539,9 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_
 # Determine nuclei overlap for each lesion mask
 ########################################################################
 
+# PC
 PC_map = cmap = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/PC.nii.gz')
+
 #nuclei
 Morel = {
 1: 'AN',
@@ -558,6 +560,7 @@ Morel = {
 14: 'PuL',
 17: 'VP'
 }
+
 morel_atlas = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
 
 for p in df.loc[df['Site'] == 'Th']['Sub'] :
@@ -580,9 +583,6 @@ for p in df.loc[df['Site'] == 'Th']['Sub'] :
 
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['MM_impaired']>3)]['PC'].values, df.loc[(df['Site']=='Th') & (df['MM_impaired']<2)]['PC'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th')]['MM_impaired'].values, df.loc[(df['Site']=='ctx')]['MM_impaired'].values)
-
-
-
 
 
 df.to_csv('~/RDSS/tmp/data_z.csv')

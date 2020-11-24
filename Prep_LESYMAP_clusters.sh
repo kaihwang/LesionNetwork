@@ -79,7 +79,7 @@ for mask in BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECA
   rm /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_${mask}.nii.gz
 
 	3dttest++ \
-	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/0*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_001.nii.gz" \
+	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/0*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_00*.nii.gz" \
 	-prefix /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_${mask}.nii.gz
 
 done
@@ -106,7 +106,7 @@ for mask in BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECA
   rm /data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_${mask}.nii.gz
 
 	3dttest++ \
-	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_001.nii.gz" \
+	-setA "/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_${mask}_000_INDIV/WB_Z_ROI_00*.nii.gz" \
 	-prefix /data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_${mask}.nii.gz
 
 done
