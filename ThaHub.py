@@ -459,12 +459,9 @@ df['MM_impaired'] = sum([df['TMTB_z_Impaired'] , df['BNT_z_Impaired'] , df['COWA
 df.to_csv('~/RDSS/tmp/data_z.csv')
 
 ########################################################################
-# Run lesion network mapping, using lesion masks as seeds
+# Run lesion network mapping
 ########################################################################
-# run Map_Network.sh
-
-
-### Use tha lesion mask as seed, test if cortical FC differ between patients
+### run Map_Network.sh, this one use thalamus lesion mask at seed and check overlap with cortical LESYMAP masks
 
 #resample LESYMAP output from 1mm grid to 2mm grid (FC maps in 2mm grid)
 # os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz")
@@ -507,7 +504,7 @@ COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas)
 #plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=0.8)
 #plotting.show()
 
-for p in df.loc[df['Site'] == 'Th']['Sub'] :
+for p in df.loc[df['Site'] == 'Th']['Sub']:
 
 	if p == '4045':
 		continue #no mask yet
@@ -533,6 +530,49 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==Tru
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==True)]['COM_FIG_COPY_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==False)]['COM_FIG_COPY_FC'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_FC'].values)
 
+
+
+### run Prep_LESYMAP_clusters.sh, this one use cortical lesion masks, separated by GM, as seeds
+lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+
+for lesymap in lesymap_clusters:
+	fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_groupFC_%s.nii.gz'  %lesymap
+	fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
+
+	for p in df.loc[df['Site'] == 'Th']['Sub']:
+		try:
+			fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+			m = nib.load(fn).get_data()
+		except:
+			continue
+
+		df.loc[df['Sub'] == p, lesymap] = np.mean(m * fcmap)
+
+print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust1'].mean())
+print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust2'].mean())
+print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust1'].mean())
+print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust2'].mean())
+print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust3'].mean())
+print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust4'].mean())
+print(df.groupby(['COWA_z_Impaired'])['COWA_Clust1'].mean())
+print(df.groupby(['COWA_z_Impaired'])['COWA_Clust2'].mean())
+print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust1'].mean())
+print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust2'].mean())
+print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust3'].mean())
+print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust4'].mean())
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_Clust1'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_Clust1'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_Clust2'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_Clust2'].values)
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust1'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust1'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust2'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust2'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust3'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust3'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust4'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust4'].values)
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust1'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust1'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust2'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust2'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust3'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust3'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust4'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust4'].values)
 
 ########################################################################
 # Calculate participation coef for each lesion mask,
