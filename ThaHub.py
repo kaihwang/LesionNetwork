@@ -10,6 +10,7 @@ from nibabel.processing import resample_from_to
 import nilearn
 import scipy
 import os
+import glob
 
 # load data
 df = pd.read_csv('~/RDSS/tmp/data.csv')
@@ -536,7 +537,7 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_
 lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
 
 for lesymap in lesymap_clusters:
-	fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/NKI_groupFC_%s.nii.gz'  %lesymap
+	fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
 	fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
 
 	for p in df.loc[df['Site'] == 'Th']['Sub']:
@@ -573,6 +574,85 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust2'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust2'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust3'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust3'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust4'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust4'].values)
+
+
+##### Use linear mixed effect regression model to test FC differences
+lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+fcdf = pd.DataFrame()
+
+i=0
+for p in df.loc[df['Site'] == 'Th']['Sub']:
+	try:
+		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+		m = nib.load(fn).get_data()
+	except:
+		continue
+
+	for lesymap in lesymap_clusters:
+		fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_%s_ncsreg_000_INDIV/*.nii.gz' %lesymap
+		files = glob.glob(fn)
+
+		s = 0
+		for f in files:
+			fcmap = nib.load(f).get_data()
+			fcdf.loc[i, 'Subject'] = str(s)
+			fcdf.loc[i, 'Patient'] = p
+			fcdf.loc[i, 'Cluster'] = lesymap
+			fcdf.loc[i, 'FC'] = np.mean(m * fcmap)
+			fcdf.loc[i, 'TMTB_z_Impaired'] = df.loc[df['Sub'] == p]['TMTB_z_Impaired'].values[0]
+			fcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
+			fcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
+			fcdf.loc[i, 'Complex_Figure_Recall_z_Impaired'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z_Impaired'].values[0]
+
+			if lesymap == 'BNT_GM_Clust1':
+				fcdf.loc[i, 'Task'] = 'BNT'
+			if lesymap == 'BNT_GM_Clust2':
+				fcdf.loc[i, 'Task'] = 'BNT'
+			if lesymap == 'BNT_GM_Clust3':
+				fcdf.loc[i, 'Task'] = 'BNT'
+			if lesymap == 'BNT_GM_Clust4':
+				fcdf.loc[i, 'Task'] = 'BNT'
+			if lesymap == 'COM_FIG_RECALL_Clust1':
+				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+			if lesymap == 'COM_FIG_RECALL_Clust2':
+				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+			if lesymap == 'COM_FIG_RECALL_Clust3':
+				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+			if lesymap == 'COM_FIG_RECALL_Clust4':
+				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+			if lesymap == 'COWA_Clust1':
+				fcdf.loc[i, 'Task'] = 'COWA'
+			if lesymap == 'COWA_Clust2':
+				fcdf.loc[i, 'Task'] = 'COWA'
+			if lesymap == 'TMTB_Clust1':
+				fcdf.loc[i, 'Task'] = 'TMTB'
+			if lesymap == 'TMTB_Clust2':
+				fcdf.loc[i, 'Task'] = 'TMTB'
+
+			i = i+1
+			s = s+1
+
+fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
+
+# statsmodel, subject with random intercept
+# https://www.statsmodels.org/stable/mixed_linear.html,
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+tdf = fcdf.loc[fcdf['Task'] == 'TMTB']
+md = smf.mixedlm("FC ~ Cluster + TMTB_z_Impaired", tdf, groups=tdf['Subject']).fit()
+print(md.summary())
+
+tdf = fcdf.loc[fcdf['Task'] == 'COWA']
+md = smf.mixedlm("FC ~ Cluster + COWA_z_Impaired", tdf, groups=tdf['Subject']).fit()
+print(md.summary())
+
+tdf = fcdf.loc[fcdf['Task'] == 'COM_FIG_RECALL']
+md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z_Impaired", tdf, groups=tdf['Subject']).fit()
+print(md.summary())
+
+tdf = fcdf.loc[fcdf['Task'] == 'BNT']
+md = smf.mixedlm("FC ~ Cluster + BNT_z_Impaired", tdf, groups=tdf['Subject']).fit()
+print(md.summary())
 
 ########################################################################
 # Calculate participation coef for each lesion mask,
