@@ -517,11 +517,11 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s.nii.gz'  %p
 		fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
 
-		df.loc[df['Sub'] == p, 'TMTB_FC'] = np.mean(fcmap * TMTB_LESYMAP_map)
-		df.loc[df['Sub'] == p, 'BNT_FC'] = np.mean(fcmap * BNT_LESYMAP_map)
-		df.loc[df['Sub'] == p, 'COWA_FC'] = np.mean(fcmap * COWA_LESYMAP_map)
-		df.loc[df['Sub'] == p, 'COM_FIG_COPY_FC'] = np.mean(fcmap * COM_FIG_COPY_LESYMAP_map)
-		df.loc[df['Sub'] == p, 'COM_FIG_RECALL_FC'] = np.mean(fcmap * COM_FIG_RECALL_LESYMAP_map)
+		df.loc[df['Sub'] == p, 'TMTB_FC'] = np.mean(fcmap[TMTB_LESYMAP_map >0])
+		df.loc[df['Sub'] == p, 'BNT_FC'] = np.mean(fcmap[BNT_LESYMAP_map >0])
+		df.loc[df['Sub'] == p, 'COWA_FC'] = np.mean(fcmap[COWA_LESYMAP_map >0])
+		df.loc[df['Sub'] == p, 'COM_FIG_COPY_FC'] = np.mean(fcmap[COM_FIG_COPY_LESYMAP_map >0])
+		df.loc[df['Sub'] == p, 'COM_FIG_RECALL_FC'] = np.mean(fcmap[COM_FIG_RECALL_LESYMAP_map >0])
 
 print(df.groupby(['TMTB_z_Impaired'])['TMTB_FC'].mean())
 print(df.groupby(['BNT_z_Impaired'])['BNT_FC'].mean())
@@ -551,7 +551,7 @@ for lesymap in lesymap_clusters:
 		except:
 			continue
 
-		df.loc[df['Sub'] == p, lesymap] = np.mean(m * fcmap)
+		df.loc[df['Sub'] == p, lesymap] = np.mean(fcmap[m>0])
 
 print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust1'].mean())
 print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust2'].mean())
@@ -602,7 +602,7 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 			fcdf.loc[i, 'Subject'] = str(s)
 			fcdf.loc[i, 'Patient'] = p
 			fcdf.loc[i, 'Cluster'] = lesymap
-			fcdf.loc[i, 'FC'] = np.mean(m * fcmap)
+			fcdf.loc[i, 'FC'] = np.mean(fcmap[m>0])
 			fcdf.loc[i, 'TMTB_z_Impaired'] = df.loc[df['Sub'] == p]['TMTB_z_Impaired'].values[0]
 			fcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
 			fcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
@@ -774,9 +774,12 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 		pcdf.loc[i, 'MM_impaired_num'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]
 		pcdf.loc[i, 'MM_impaired'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]>2
 		i = i+1
-		
+
 pcdf['MM_impaired'] = pcdf['MM_impaired_num'] >=2
 md = smf.mixedlm("PC ~ MM_impaired", pcdf, groups=pcdf['Subject']).fit()
+print(md.summary())
+
+md = smf.mixedlm("PC ~ MM_impaired_num", pcdf, groups=pcdf['Subject']).fit()
 print(md.summary())
 
 # from nilearn import plotting
