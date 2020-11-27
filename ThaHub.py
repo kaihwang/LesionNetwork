@@ -11,6 +11,10 @@ import nilearn
 import scipy
 import os
 import glob
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+from nilearn import masking
+
 
 # load data
 df = pd.read_csv('~/RDSS/tmp/data.csv')
@@ -636,8 +640,7 @@ fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
 
 # statsmodel, subject with random intercept
 # https://www.statsmodels.org/stable/mixed_linear.html,
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
+
 tdf = fcdf.loc[fcdf['Task'] == 'TMTB']
 md = smf.mixedlm("FC ~ Cluster + TMTB_z_Impaired", tdf, groups=tdf['Subject']).fit()
 print(md.summary())
@@ -701,8 +704,87 @@ for p in df.loc[df['Site'] == 'Th']['Sub'] :
 		for n in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17]:
 			df.loc[df['Sub']==p, Morel[n]] = 8 * np.sum(lesion_mask.get_data()[morel_atlas==n])
 
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['MM_impaired']>3)]['PC'].values, df.loc[(df['Site']=='Th') & (df['MM_impaired']<2)]['PC'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['MM_impaired']>2)]['PC'].values, df.loc[(df['Site']=='Th') & (df['MM_impaired']<2)]['PC'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th')]['MM_impaired'].values, df.loc[(df['Site']=='ctx')]['MM_impaired'].values)
 
 
 df.to_csv('~/RDSS/tmp/data_z.csv')
+
+########################################################################
+# Calculate lesymap FC's participation coef, using different lesymap seed FC as "communities"
+########################################################################
+
+### Use nilearn masker to get every tha voxel
+#Thalamus mask
+thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
+thalamus_mask_data = thalamus_mask_data>0
+thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data, copy_header = True)
+
+fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_BNT_GM_Clust1_ncsreg_000_INDIV/*.nii.gz'
+files = glob.glob(fn)
+
+# FCMaps
+lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+# How FC Maps are grouped into task indices
+lesymap_CI = np.array([1, 1, 1 , 1, 2, 2, 2, 2, 3, 3, 4, 4])
+
+fc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(lesymap_CI), len(files)))
+for il, lesymap in enumerate(lesymap_clusters):
+	fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_%s_ncsreg_000_INDIV/*.nii.gz' %lesymap
+	files = glob.glob(fn)
+	for ix, f in enumerate(files):
+		fcmap = nib.load(f)
+		fc_vectors[:,il, ix] = masking.apply_mask(fcmap, thalamus_mask)
+
+
+np.save('fc_vectors', fc_vectors)
+fc_vectors = np.load('fc_vectors.npy')
+fc_vectors[fc_vectors<0] = 0
+
+#FC's PC calculation
+fc_sum = np.sum(fc_vectors, axis = 1)
+
+kis = np.zeros(np.shape(fc_sum))
+for ci in np.array([1, 2, 3, 4]):
+	kis = kis + np.square(np.sum(fc_vectors[:,np.where(lesymap_CI==ci)[0],:], axis=1) / fc_sum)
+fc_pc = 1-kis
+
+
+pcdf = pd.DataFrame()
+i=0
+for p in df.loc[df['Site'] == 'Th']['Sub']:
+	try:
+		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+		m = nib.load(fn).get_data()
+	except:
+		continue
+
+	for s in np.arange(0, np.shape(fc_pc)[1]):
+		pc = fc_pc[:,s]
+		pc_image = masking.unmask(pc, thalamus_mask).get_data()
+
+		pcdf.loc[i, 'Subject'] = str(s)
+		pcdf.loc[i, 'Patient'] = p
+		pcdf.loc[i, 'PC'] = np.mean(pc_image[np.where(m>0)][pc_image[np.where(m>0)]>0])
+		pcdf.loc[i, 'TMTB_z_Impaired'] = df.loc[df['Sub'] == p]['TMTB_z_Impaired'].values[0]
+		pcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
+		pcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
+		pcdf.loc[i, 'Complex_Figure_Recall_z_Impaired'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z_Impaired'].values[0]
+		pcdf.loc[i, 'MM_impaired_num'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]
+		pcdf.loc[i, 'MM_impaired'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]>2
+		i = i+1
+		
+pcdf['MM_impaired'] = pcdf['MM_impaired_num'] >=2
+md = smf.mixedlm("PC ~ MM_impaired", pcdf, groups=pcdf['Subject']).fit()
+print(md.summary())
+
+# from nilearn import plotting
+# pc_image = masking.unmask(pc, thalamus_mask)
+# plotting.plot_glass_brain(pc_image, threshold=0.01)
+# plotting.show()
+#
+# plotting.plot_glass_brain(nib.load(fn), threshold=0.01)
+# plotting.show()
+
+#end of line
