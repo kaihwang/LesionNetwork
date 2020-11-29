@@ -1,5 +1,4 @@
 #Test multidomain hub properties in the human thalamus
-
 import numpy as np
 import pandas as pd
 import nibabel as nib
@@ -14,7 +13,7 @@ import glob
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from nilearn import masking
-
+from nilearn import plotting
 
 # load data
 df = pd.read_csv('~/RDSS/tmp/data.csv')
@@ -585,6 +584,7 @@ lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_C
 fcdf = pd.DataFrame()
 
 i=0
+
 for p in df.loc[df['Site'] == 'Th']['Sub']:
 	try:
 		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
@@ -659,11 +659,11 @@ print(md.summary())
 
 ########################################################################
 # Calculate participation coef for each lesion mask,
-# Determine nuclei overlap for each lesion mask
+# Determine nuclei overlap for each lesion mask.
 ########################################################################
 
-# PC
-PC_map = cmap = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/PC.nii.gz')
+#### PC from the JN paper, calcuated based on resting-state networks
+PC_map = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/PC.nii.gz')
 
 #nuclei
 Morel = {
@@ -707,19 +707,59 @@ for p in df.loc[df['Site'] == 'Th']['Sub'] :
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['MM_impaired']>2)]['PC'].values, df.loc[(df['Site']=='Th') & (df['MM_impaired']<2)]['PC'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th')]['MM_impaired'].values, df.loc[(df['Site']=='ctx')]['MM_impaired'].values)
 
-
 df.to_csv('~/RDSS/tmp/data_z.csv')
+
+#### calculate PC subject by subject, so we can fit a linear mixed effect model
+thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
+thalamus_mask_data = thalamus_mask_data>0
+thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data, copy_header = True)
+Schaefer400_mask = nib.load('/home/kahwang/bsh/ROIs/Schaefer400_7network_2mm.nii.gz')
+
+from nilearn.input_data import NiftiLabelsMasker
+cortex_masker = NiftiLabelsMasker(labels_img='/home/kahwang/bsh/ROIs/Schaefer400_7network_2mm.nii.gz', standardize=False)
+
+Schaeffer_CI = np.loadtxt('/home/kahwang/bin/LesionNetwork/Schaeffer400_7network_CI')
+
+fn = '/home/kahwang/bsh/MGH/MGH/*/MNINonLinear/rfMRI_REST_ncsreg.nii.gz'
+files = glob.glob(fn)
+
+
+pc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(files)))
+for ix, f in enumerate(files):
+	functional_data = nib.load(f)
+
+	#extract cortical ts from schaeffer 400 ROIs
+	cortex_ts = cortex_masker.fit_transform(functional_data)
+
+	#extract thalamus vox by vox ts
+	thalamus_ts = masking.apply_mask(functional_data, thalamus_mask)
+
+	# concate, cortex + thalamus voxel, dimesnion should be 2627 (400 cortical ROIs plus 2227 thalamus voxel from morel atlas)
+	ts = np.concatenate((cortex_ts, thalamus_ts), axis=1)
+	corrmat = np.corrcoef(ts.T)
+
+	#extrat the thalamus by cortex FC matrix
+	thalamocortical_fc = corrmat[400:, 0:400]
+
+	#calculate PC with the extracted thalamocortical FC matrix
+	thalamocortical_fc[thalamocortical_fc<0] = 0
+	fc_sum = np.sum(thalamocortical_fc, axis=1)
+	kis = np.zeros(np.shape(fc_sum))
+	for ci in np.unique(Schaeffer_CI):
+		kis = kis + np.square(np.sum(thalamocortical_fc[:,np.where(Schaeffer_CI==ci)[0]], axis=1) / fc_sum)
+
+	pc_vectors[:,ix] = 1-kis
+
+np.save('pc_vectors', pc_vectors)
+
 
 ########################################################################
 # Calculate lesymap FC's participation coef, using different lesymap seed FC as "communities"
 ########################################################################
 
 ### Use nilearn masker to get every tha voxel
-#Thalamus mask
-thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
-thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
-thalamus_mask_data = thalamus_mask_data>0
-thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data, copy_header = True)
+#Thalamus mask loaded above
 
 fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_BNT_GM_Clust1_ncsreg_000_INDIV/*.nii.gz'
 files = glob.glob(fn)
@@ -729,6 +769,7 @@ lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_C
 # How FC Maps are grouped into task indices
 lesymap_CI = np.array([1, 1, 1 , 1, 2, 2, 2, 2, 3, 3, 4, 4])
 
+# extra thalamic voxel by lesymap seed FC vectors, save.
 fc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(lesymap_CI), len(files)))
 for il, lesymap in enumerate(lesymap_clusters):
 	fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_%s_ncsreg_000_INDIV/*.nii.gz' %lesymap
@@ -736,21 +777,25 @@ for il, lesymap in enumerate(lesymap_clusters):
 	for ix, f in enumerate(files):
 		fcmap = nib.load(f)
 		fc_vectors[:,il, ix] = masking.apply_mask(fcmap, thalamus_mask)
-
-
 np.save('fc_vectors', fc_vectors)
+
+
+#### Calculate PC with lesmap seed FC vector, then do mixed effect regression
+# load lesymap seed FC vectors
 fc_vectors = np.load('fc_vectors.npy')
 fc_vectors[fc_vectors<0] = 0
 
-#FC's PC calculation
+#lessymap FC's PC calculation
 fc_sum = np.sum(fc_vectors, axis = 1)
-
 kis = np.zeros(np.shape(fc_sum))
 for ci in np.array([1, 2, 3, 4]):
 	kis = kis + np.square(np.sum(fc_vectors[:,np.where(lesymap_CI==ci)[0],:], axis=1) / fc_sum)
 fc_pc = 1-kis
 
+#load PC vectors
+pc_vectors = np.load('pc_vectors.npy')
 
+# create DF
 pcdf = pd.DataFrame()
 i=0
 for p in df.loc[df['Site'] == 'Th']['Sub']:
@@ -761,12 +806,15 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 		continue
 
 	for s in np.arange(0, np.shape(fc_pc)[1]):
-		pc = fc_pc[:,s]
-		pc_image = masking.unmask(pc, thalamus_mask).get_data()
+		lpc = fc_pc[:,s]
+		lcpc_image = masking.unmask(lpc, thalamus_mask).get_data()
+		pc = pc_vectors[:,s]
+		fcpc_image = masking.unmask(pc, thalamus_mask).get_data()
 
 		pcdf.loc[i, 'Subject'] = str(s)
 		pcdf.loc[i, 'Patient'] = p
-		pcdf.loc[i, 'PC'] = np.mean(pc_image[np.where(m>0)][pc_image[np.where(m>0)]>0])
+		pcdf.loc[i, 'LESYMAP_PC'] = np.nanmean(lcpc_image[np.where(m>0)][lcpc_image[np.where(m>0)]>0]) #PC from lesymap seed FC
+		pcdf.loc[i, 'PC'] = np.nanmean(fcpc_image[np.where(m>0)][fcpc_image[np.where(m>0)]>0]) #PC from reseting-state netwowrks
 		pcdf.loc[i, 'TMTB_z_Impaired'] = df.loc[df['Sub'] == p]['TMTB_z_Impaired'].values[0]
 		pcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
 		pcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
@@ -775,7 +823,16 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 		pcdf.loc[i, 'MM_impaired'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]>2
 		i = i+1
 
+pcdf =pcdf.dropna()
 pcdf['MM_impaired'] = pcdf['MM_impaired_num'] >=2
+pcdf.to_csv('~/RDSS/tmp/pcdf.csv')
+
+md = smf.mixedlm("LESYMAP_PC ~ MM_impaired", pcdf, groups=pcdf['Subject']).fit()
+print(md.summary())
+
+md = smf.mixedlm("LESYMAP_PC ~ MM_impaired_num", pcdf, groups=pcdf['Subject']).fit()
+print(md.summary())
+
 md = smf.mixedlm("PC ~ MM_impaired", pcdf, groups=pcdf['Subject']).fit()
 print(md.summary())
 
@@ -789,5 +846,12 @@ print(md.summary())
 #
 # plotting.plot_glass_brain(nib.load(fn), threshold=0.01)
 # plotting.show()
+
+#### Check if lesymap FC's participation coef correlate with resting-state network's PC
+print(np.corrcoef(np.nanmean(pc_vectors, axis=1),np.nanmean(fc_pc, axis=1)))
+
+
+
+
 
 #end of line
