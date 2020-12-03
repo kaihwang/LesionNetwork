@@ -502,7 +502,7 @@ BNT_LESYMAP_map = 1* ((1 * BNT_LESYMAP_map - 1 * WM_atlas) > 0)
 COWA_LESYMAP_map = 1* ((1 * COWA_LESYMAP_map - 1 * WM_atlas) > 0)
 COM_FIG_COPY_LESYMAP_map = 1* ((1 * COM_FIG_COPY_LESYMAP_map - 1 * WM_atlas) > 0)
 COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas) > 0)
-#
+
 # a = nilearn.image.new_img_like(m, TMTB_LESYMAP_map, copy_header=True)
 # a.to_filename('test.nii')
 #plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=0.8)
@@ -851,6 +851,42 @@ print(md.summary())
 print(np.corrcoef(np.nanmean(pc_vectors, axis=1),np.nanmean(fc_pc, axis=1)))
 
 
+########################################################################
+# White matter tracktography
+########################################################################
+
+WM_densities = ['BNT', 'COM_FIG_RECALL', 'CONS_CFT', 'COWA', 'TMTB']
+
+for i, p in enumerate(df.loc[df['Site'] == 'Th']['Sub']):
+
+	#WM density is in 1mm gtid, so resample lesion mask
+	#cmd = "3dresample -master /home/kahwang/LESYMAP_for_Kai/BNT_WMTrack.nii.gz -inset /home/kahwang/0.5mm/%s.nii.gz -prefix /home/kahwang/0.5mm/%s_1mm.nii.gz" %(p, p)
+	#os.system(cmd)
+
+	try:
+		fn = '/home/kahwang/0.5mm/%s_1mm.nii.gz' %p
+		m = nib.load(fn).get_data()
+
+	except:
+		continue
+
+	for wm in WM_densities:
+		fn = '/home/kahwang/LESYMAP_for_Kai/%s_WMTrack.nii.gz' %wm
+		wm_density = nib.load(fn).get_data()
+		if any(wm_density[np.where(m>0)]):
+			df.loc[i, wm + '_WMtrack'] = 1.0
+		else:
+			df.loc[i, wm + '_WMtrack'] = 0.0
+
+		df[wm + '_WMtrack'] = df[wm + '_WMtrack'].astype('float')
+
+df.to_csv('~/RDSS/tmp/data_z.csv')
+
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_WMtrack']>0)]['BNT_z'].values, df.loc[(df['Site']=='Th') & (df['BNT_WMtrack']==0)]['BNT_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COM_FIG_RECALL_WMtrack']>0)]['Complex_Figure_Recall_z'].values, df.loc[(df['Site']=='Th') & (df['COM_FIG_RECALL_WMtrack']==0)]['Complex_Figure_Recall_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']>0)]['Complex_Figure_Copy_z'].values, df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']==0)]['Complex_Figure_Copy_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']>0)]['COWA_z'].values, df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']==0)]['COWA_z'].values)
+scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']>0)]['TMTB_z'].values, df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']==0)]['TMTB_z'].values)
 
 
 
