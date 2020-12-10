@@ -141,6 +141,64 @@ RAVLT_Recognition_norm = {
 '85': {'mean': 12.3 , 'sd': 2.3},
 }
 
+#RAVLT learning Norms, from trial 1 to trial 5
+
+#trial 1
+RAVLT_T1_norm = {
+'59': {'mean': 6.8, 'sd': 1.6},
+'64': {'mean': 6.4 , 'sd': 1.9},
+'69': {'mean': 5.7, 'sd': 1.6},
+'74': {'mean': 5.5, 'sd': 1.5},
+'79': {'mean': 5.0 , 'sd': 1.5},
+'84': {'mean': 4.4 , 'sd': 1.5},
+'85': {'mean': 4.0 , 'sd': 1.8},
+}
+
+#trial 2
+RAVLT_T2_norm = {
+'59': {'mean': 9.5, 'sd': 2.2},
+'64': {'mean': 9.0 , 'sd': 2.3},
+'69': {'mean': 8.6, 'sd': 2.1},
+'74': {'mean': 7.8, 'sd': 1.8},
+'79': {'mean': 7.0 , 'sd': 1.9},
+'84': {'mean': 6.5 , 'sd': 1.5},
+'85': {'mean': 6.0 , 'sd': 1.8},
+}
+
+#trial 3
+RAVLT_T3_norm = {
+'59': {'mean': 11.4, 'sd': 2.0},
+'64': {'mean': 10.6 , 'sd': 2.3},
+'69': {'mean': 9.7, 'sd': 2.3},
+'74': {'mean': 9.1, 'sd': 2.1},
+'79': {'mean': 8.2 , 'sd': 2.2},
+'84': {'mean': 7.7 , 'sd': 2.1},
+'85': {'mean': 7.4 , 'sd': 2.2},
+}
+
+#trial 4
+RAVLT_T4_norm = {
+'59': {'mean': 12.4, 'sd': 1.9},
+'64': {'mean': 11.7 , 'sd': 2.7},
+'69': {'mean': 10.6, 'sd': 2.4},
+'74': {'mean': 10.2, 'sd': 2.4},
+'79': {'mean': 9.2 , 'sd': 2.2},
+'84': {'mean': 8.6 , 'sd': 2.5},
+'85': {'mean': 7.9 , 'sd': 2.4},
+}
+
+#trial 5
+RAVLT_T5_norm = {
+'59': {'mean': 13.1, 'sd': 1.9},
+'64': {'mean': 11.9 , 'sd': 2.0},
+'69': {'mean': 11.2, 'sd': 2.4},
+'74': {'mean': 10.5, 'sd': 2.6},
+'79': {'mean': 10.1 , 'sd': 2.2},
+'84': {'mean': 9.0 , 'sd': 2.5},
+'85': {'mean': 9.1 , 'sd': 2.3},
+}
+
+
 # rey o complex figure construction
 #   40  32.83 (3.1)
 #   50  31.79 (4.55)
@@ -318,6 +376,83 @@ for i in df.index:
 	elif 84 < df.loc[i, 'Age']:
 		df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['85']['mean']) / RAVLT_Recognition_norm['85']['sd']
 
+	if df.loc[i, 'Age'] <= 59:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['59']['mean']) / RAVLT_T1_norm['59']['sd']
+	elif 59 < df.loc[i, 'Age'] <= 64:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['64']['mean']) / RAVLT_T1_norm['64']['sd']
+	elif 64 < df.loc[i, 'Age'] <= 69:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['69']['mean']) / RAVLT_T1_norm['69']['sd']
+	elif 69 < df.loc[i, 'Age'] <= 74:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['74']['mean']) / RAVLT_T1_norm['74']['sd']
+	elif 74 < df.loc[i, 'Age'] <= 79:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['79']['mean']) / RAVLT_T1_norm['79']['sd']
+	elif 79 < df.loc[i, 'Age'] <= 84:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['84']['mean']) / RAVLT_T1_norm['84']['sd']
+	elif 84 < df.loc[i, 'Age']:
+		df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['85']['mean']) / RAVLT_T1_norm['85']['sd']
+
+	if df.loc[i, 'Age'] <= 59:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['59']['mean']) / RAVLT_T2_norm['59']['sd']
+	elif 59 < df.loc[i, 'Age'] <= 64:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['64']['mean']) / RAVLT_T2_norm['64']['sd']
+	elif 64 < df.loc[i, 'Age'] <= 69:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['69']['mean']) / RAVLT_T2_norm['69']['sd']
+	elif 69 < df.loc[i, 'Age'] <= 74:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['74']['mean']) / RAVLT_T2_norm['74']['sd']
+	elif 74 < df.loc[i, 'Age'] <= 79:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['79']['mean']) / RAVLT_T2_norm['79']['sd']
+	elif 79 < df.loc[i, 'Age'] <= 84:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['84']['mean']) / RAVLT_T2_norm['84']['sd']
+	elif 84 < df.loc[i, 'Age']:
+		df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['85']['mean']) / RAVLT_T2_norm['85']['sd']
+
+	if df.loc[i, 'Age'] <= 59:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['59']['mean']) / RAVLT_T3_norm['59']['sd']
+	elif 59 < df.loc[i, 'Age'] <= 64:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['64']['mean']) / RAVLT_T3_norm['64']['sd']
+	elif 64 < df.loc[i, 'Age'] <= 69:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['69']['mean']) / RAVLT_T3_norm['69']['sd']
+	elif 69 < df.loc[i, 'Age'] <= 74:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['74']['mean']) / RAVLT_T3_norm['74']['sd']
+	elif 74 < df.loc[i, 'Age'] <= 79:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['79']['mean']) / RAVLT_T3_norm['79']['sd']
+	elif 79 < df.loc[i, 'Age'] <= 84:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['84']['mean']) / RAVLT_T3_norm['84']['sd']
+	elif 84 < df.loc[i, 'Age']:
+		df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['85']['mean']) / RAVLT_T3_norm['85']['sd']
+
+	if df.loc[i, 'Age'] <= 59:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['59']['mean']) / RAVLT_T4_norm['59']['sd']
+	elif 59 < df.loc[i, 'Age'] <= 64:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['64']['mean']) / RAVLT_T4_norm['64']['sd']
+	elif 64 < df.loc[i, 'Age'] <= 69:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['69']['mean']) / RAVLT_T4_norm['69']['sd']
+	elif 69 < df.loc[i, 'Age'] <= 74:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['74']['mean']) / RAVLT_T4_norm['74']['sd']
+	elif 74 < df.loc[i, 'Age'] <= 79:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['79']['mean']) / RAVLT_T4_norm['79']['sd']
+	elif 79 < df.loc[i, 'Age'] <= 84:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['84']['mean']) / RAVLT_T4_norm['84']['sd']
+	elif 84 < df.loc[i, 'Age']:
+		df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['85']['mean']) / RAVLT_T4_norm['85']['sd']
+
+	if df.loc[i, 'Age'] <= 59:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['59']['mean']) / RAVLT_T5_norm['59']['sd']
+	elif 59 < df.loc[i, 'Age'] <= 64:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['64']['mean']) / RAVLT_T5_norm['64']['sd']
+	elif 64 < df.loc[i, 'Age'] <= 69:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['69']['mean']) / RAVLT_T5_norm['69']['sd']
+	elif 69 < df.loc[i, 'Age'] <= 74:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['74']['mean']) / RAVLT_T5_norm['74']['sd']
+	elif 74 < df.loc[i, 'Age'] <= 79:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['79']['mean']) / RAVLT_T5_norm['79']['sd']
+	elif 79 < df.loc[i, 'Age'] <= 84:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['84']['mean']) / RAVLT_T5_norm['84']['sd']
+	elif 84 < df.loc[i, 'Age']:
+		df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['85']['mean']) / RAVLT_T5_norm['85']['sd']
+
+
+
 	if df.loc[i, 'Age'] <= 40:
 		df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['40']['mean']) / Complex_Figure_Copy_norm['40']['sd']
 	elif 40 < df.loc[i, 'Age'] <= 50:
@@ -444,6 +579,12 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Delayed_Recall_z'].v
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'].values, df.loc[df['Site']=='Th']['RAVLT_Recognition_z'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values)
+
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T1_z'].values, df.loc[df['Site']=='Th']['RAVLT_T1_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
 
 
 ########################################################################
@@ -607,6 +748,10 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 			fcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
 			fcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
 			fcdf.loc[i, 'Complex_Figure_Recall_z_Impaired'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z_Impaired'].values[0]
+			fcdf.loc[i, 'TMTB_z'] = df.loc[df['Sub'] == p]['TMTB_z'].values[0]
+			fcdf.loc[i, 'BNT_z'] = df.loc[df['Sub'] == p]['BNT_z'].values[0]
+			fcdf.loc[i, 'COWA_z'] = df.loc[df['Sub'] == p]['COWA_z'].values[0]
+			fcdf.loc[i, 'Complex_Figure_Recall_z'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z'].values[0]
 
 			if lesymap == 'BNT_GM_Clust1':
 				fcdf.loc[i, 'Task'] = 'BNT'
@@ -642,19 +787,33 @@ fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
 # https://www.statsmodels.org/stable/mixed_linear.html,
 
 tdf = fcdf.loc[fcdf['Task'] == 'TMTB']
+# categorical, compare impaired v unimpaired has a difference in FC
 md = smf.mixedlm("FC ~ Cluster + TMTB_z_Impaired", tdf, groups=tdf['Subject']).fit()
 print(md.summary())
+# linear relation, whether zscore has a relationship with FC
+
+md = smf.mixedlm("FC ~ Cluster + TMTB_z", tdf.dropna() , groups=tdf.dropna()['Subject']).fit()
+print(md.summary())
+
 
 tdf = fcdf.loc[fcdf['Task'] == 'COWA']
 md = smf.mixedlm("FC ~ Cluster + COWA_z_Impaired", tdf, groups=tdf['Subject']).fit()
 print(md.summary())
 
+md = smf.mixedlm("FC ~ Cluster + COWA_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
+print(md.summary())
+
+
 tdf = fcdf.loc[fcdf['Task'] == 'COM_FIG_RECALL']
 md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z_Impaired", tdf, groups=tdf['Subject']).fit()
+print(md.summary())
+md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
 print(md.summary())
 
 tdf = fcdf.loc[fcdf['Task'] == 'BNT']
 md = smf.mixedlm("FC ~ Cluster + BNT_z_Impaired", tdf, groups=tdf['Subject']).fit()
+print(md.summary())
+md = smf.mixedlm("FC ~ Cluster + BNT_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
 print(md.summary())
 
 ########################################################################
