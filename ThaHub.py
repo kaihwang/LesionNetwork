@@ -1047,6 +1047,43 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']>0)]
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']>0)]['COWA_z'].values, df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']==0)]['COWA_z'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']>0)]['TMTB_z'].values, df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']==0)]['TMTB_z'].values)
 
+################################
+# Plot table of z scores to show mutlimodal impairment
+################################
+
+ddf = df[['SubID','TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
+	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
+	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z','MM_impaired']]
+tddf = ddf.loc[df['Site']=='Th']
+
+#invert tmtbz
+tddf['TMTB_z'] = tddf['TMTB_z']*-1
+
+for c in ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
+	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
+	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']:
+	print(c)
+	tddf[c].loc[tddf[c]>-1]=0
+
+
+#tddf=tddf.fillna(0)
+tddf = tddf.set_index('SubID')
+sns.heatmap(tddf.sort_values('MM_impaired'), vmin = -6, vmax=6, center=0, cmap="coolwarm")
+plotting.show()
+
+### patients with MM impairments (>3):
+# 2105 2552 2092 ca085 ca093 ca104 ca105
+# 2105: TMTB, COWA, RVLT recall,
+# 2552: TMTB, BNT, COWA, RVLT recall
+# 2092: TMTB, COWA, RVLT recall, RVLT recog, RVLT, learn.
+# ca085: BNT, RVLT recall, Com Figure Copy, Fig COM_FIG_RECALL
+# CA093, BNT, RVLT recog, RVLT learn, com fig copy, com fig COM_FIG_RECAL
+# ca104, TMTB, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recall
+# ca105, TMTB, COWA, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recal
+
+
 
 
 #end of line
