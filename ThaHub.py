@@ -14,6 +14,7 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from nilearn import masking
 from nilearn import plotting
+import matplotlib.pyplot as plt
 
 # load data
 df = pd.read_csv('~/RDSS/tmp/data.csv')
@@ -1082,6 +1083,54 @@ plotting.show()
 # CA093, BNT, RVLT recog, RVLT learn, com fig copy, com fig COM_FIG_RECAL
 # ca104, TMTB, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recall
 # ca105, TMTB, COWA, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recal
+
+
+################################
+# compare voxel distribution of lesymap FC weights for different tasks, for each lesion mask
+################################
+# seems like the best way is to first calculation the ratio of FC / total FC weight, and plot the voxel wise ditribution of this ratio. You would expect most be around .5 (for 2 tasks) or .3 (for 3 tasks)
+lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+
+lesymap_clusters_p={}
+lesymap_clusters_p['2105'] = ['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+
+vwdf = pd.DataFrame()
+
+for p in ['2105']:
+	try:
+		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+		m = nib.load(fn).get_data()
+	except:
+		continue
+
+
+	fcsum=0
+	for lesymap in lesymap_clusters_p[p]:
+		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+		fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
+		fcmap[fcmap<0] = 0
+		fcsum = fcsum+abs(fcmap)
+
+	tempdf=	pd.DataFrame()
+	for lesymap in lesymap_clusters_p[p]:
+		ttdf = pd.DataFrame()
+		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+		fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
+		fcmap[fcmap<0] = 0
+		ttdf['weight'] = abs(fcmap)/fcsum
+		ttdf['task'] = lesymap
+		ttdf['subject'] = p
+
+		tempdf = pd.concat([ttdf,tempdf])
+	vwdf = pd.concat([tempdf,vwdf])
+
+sdf = vwdf.loc[vwdf['subject']=='2105']
+sdf = sdf.loc[sdf['task'].isin(['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2'])]
+sns.histplot(data=sdf, x="weight", hue="task", stat="probability", kde=True)
+plt.show()
+
+
+
 
 
 
