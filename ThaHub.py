@@ -567,25 +567,35 @@ def determine_comparison_patients():
 			else:
 				df.loc[i, 'Complex_Figure_Copy_Comparison'] = False
 
-			if np.sum(res_m*REY2_LESYMAP_map)==0:
-				df.loc[i, 'REY2_Comparison'] = True
+			if np.sum(res_m*COM_FIG_RECALL_LESYMAP_map)==0:
+				df.loc[i, 'Complex_Figure_Recall_Comparison'] = True
 			else:
-				df.loc[i, 'REY2_Comparison'] = False
+				df.loc[i, 'Complex_Figure_Recall_Comparison'] = False
+
+			if np.sum(res_m*REY2_LESYMAP_map)==0:
+				df.loc[i, 'RAVLT_T2_Comparison'] = True
+			else:
+				df.loc[i, 'RAVLT_T2_Comparison'] = False
 
 			if np.sum(res_m*REY3_LESYMAP_map)==0:
-				df.loc[i, 'REY3_Comparison'] = True
+				df.loc[i, 'RAVLT_T3_Comparison'] = True
 			else:
-				df.loc[i, 'REY3_Comparison'] = False
+				df.loc[i, 'RAVLT_T3_Comparison'] = False
 
 			if np.sum(res_m*REY4_LESYMAP_map)==0:
-				df.loc[i, 'REY4_Comparison'] = True
+				df.loc[i, 'RAVLT_T4_Comparison'] = True
 			else:
-				df.loc[i, 'REY4_Comparison'] = False
+				df.loc[i, 'RAVLT_T4_Comparison'] = False
 
 			if np.sum(res_m*REY5_LESYMAP_map)==0:
-				df.loc[i, 'REY5_Comparison'] = True
+				df.loc[i, 'RAVLT_T5_Comparison'] = True
 			else:
-				df.loc[i, 'REY5_Comparison'] = False
+				df.loc[i, 'RAVLT_T5_Comparison'] = False
+
+			df.loc[i, 'TMTA_Comparison'] = True
+			df.loc[i, 'RAVLT_T1_Comparison'] = True
+			df.loc[i, 'RAVLT_Delayed_Recall_Comparison'] = True
+			df.loc[i, 'RAVLT_Recognition_Comparison'] = True
 
 		except:
 			continue
@@ -632,21 +642,74 @@ if __name__ == "__main__":
 ########################################################################
 df = pd.read_csv('~/RDSS/tmp/data_z.csv')
 
+# t tests
+print('TMTA')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values))
+
+print('TMTB')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values))
+
+print('BNT')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['BNT_Comparison']==True)]['BNT_z'].values, df.loc[df['Site']=='Th']['BNT_z'].values))
+
+print('COWA')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['COWA_Comparison']==True)]['COWA_z'].values, df.loc[df['Site']=='Th']['COWA_z'].values))
+
+print('RAVLT recall')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Delayed_Recall_z'].values, df.loc[df['Site']=='Th']['RAVLT_Delayed_Recall_z'].values))
+print('RAVLT, recog')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'].values, df.loc[df['Site']=='Th']['RAVLT_Recognition_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values))
+
+print('RAVLT, learning trials')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T1_z'].values, df.loc[df['Site']=='Th']['RAVLT_T1_z'].values))
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY2_Comparison']==True)]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY3_Comparison']==True)]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY4_Comparison']==True)]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY5_Comparison']==True)]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
 
+print('complex figure, copy and recall')
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values))
 
+
+# plot scores to compare groups
+list_of_neuropsych = ['TMT Part A', 'TMT Part B', 'Boston Naming', 'COWA', 'RAVLT Delayed Recall', 'RAVLT Recognition', 'RAVLT Trial 1', ' RAVLT Trial 2',
+'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5', 'Complex Figure Copy', 'Complex Figure Recall']
+
+list_of_neuropsych_z = ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z', 'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']
+
+list_of_neuropsych_comp = ['TMTA_Comparison', 'TMTB_Comparison', 'BNT_Comparison', 'COWA_Comparison', 'RAVLT_Delayed_Recall_Comparison', 'RAVLT_Recognition_Comparison', 'RAVLT_T1_Comparison',
+'RAVLT_T2_Comparison', 'RAVLT_T3_Comparison', 'RAVLT_T4_Comparison', 'RAVLT_T5_Comparison', 'Complex_Figure_Copy_Comparison', 'Complex_Figure_Recall_Comparison']
+
+def plot_neuropsy_comparisons():
+
+	#Need to only plot included comparison patients
+
+	for i, test in enumerate(list_of_neuropsych_z):
+		plt.figure(figsize=[2.4,3])
+		sns.set_context('paper', font_scale=1)
+		sns.set_style('white')
+		sns.set_palette("Set1")
+
+		tdf = df.loc[df[list_of_neuropsych_comp[i]]==True]
+		fig1=sns.pointplot(x="Site", y=test, join=False, hue='Site', dodge=False,
+		              data=tdf)
+		fig1=sns.stripplot(x="Site", y=test,
+		              data=tdf, alpha = .4)
+
+		fig1.set_xticklabels(['Thalamic \nPatients', 'Comparison \nPatients'])
+		#fig1.set_ylim([-3, 7])
+		#fig1.set_aspect(.15)
+		fig1.legend_.remove()
+		plt.xlabel('')
+		plt.ylabel(list_of_neuropsych[i])
+		plt.tight_layout()
+		fn = '/home/kahwang/RDSS/tmp/fig_%s.pdf' %test
+		plt.savefig(fn)
+		plt.close()
+		
+plot_neuropsy_comparisons()
 
 ########################################################################
 # Run lesion network mapping
