@@ -378,79 +378,79 @@ def load_and_normalize_neuropsych_data():
 			df.loc[i, 'RAVLT_Recognition_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_Recognition_norm['85']['mean']) / RAVLT_Recognition_norm['85']['sd']
 
 		if df.loc[i, 'Age'] <= 59:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['59']['mean']) / RAVLT_T1_norm['59']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['59']['mean']) / RAVLT_T1_norm['59']['sd']
 		elif 59 < df.loc[i, 'Age'] <= 64:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['64']['mean']) / RAVLT_T1_norm['64']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['64']['mean']) / RAVLT_T1_norm['64']['sd']
 		elif 64 < df.loc[i, 'Age'] <= 69:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['69']['mean']) / RAVLT_T1_norm['69']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['69']['mean']) / RAVLT_T1_norm['69']['sd']
 		elif 69 < df.loc[i, 'Age'] <= 74:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['74']['mean']) / RAVLT_T1_norm['74']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['74']['mean']) / RAVLT_T1_norm['74']['sd']
 		elif 74 < df.loc[i, 'Age'] <= 79:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['79']['mean']) / RAVLT_T1_norm['79']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['79']['mean']) / RAVLT_T1_norm['79']['sd']
 		elif 79 < df.loc[i, 'Age'] <= 84:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['84']['mean']) / RAVLT_T1_norm['84']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['84']['mean']) / RAVLT_T1_norm['84']['sd']
 		elif 84 < df.loc[i, 'Age']:
-			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T1_norm['85']['mean']) / RAVLT_T1_norm['85']['sd']
+			df.loc[i, 'RAVLT_T1_z'] = (df.loc[i, 'RAVLT_T1'] - RAVLT_T1_norm['85']['mean']) / RAVLT_T1_norm['85']['sd']
 
 		if df.loc[i, 'Age'] <= 59:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['59']['mean']) / RAVLT_T2_norm['59']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['59']['mean']) / RAVLT_T2_norm['59']['sd']
 		elif 59 < df.loc[i, 'Age'] <= 64:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['64']['mean']) / RAVLT_T2_norm['64']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['64']['mean']) / RAVLT_T2_norm['64']['sd']
 		elif 64 < df.loc[i, 'Age'] <= 69:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['69']['mean']) / RAVLT_T2_norm['69']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['69']['mean']) / RAVLT_T2_norm['69']['sd']
 		elif 69 < df.loc[i, 'Age'] <= 74:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['74']['mean']) / RAVLT_T2_norm['74']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['74']['mean']) / RAVLT_T2_norm['74']['sd']
 		elif 74 < df.loc[i, 'Age'] <= 79:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['79']['mean']) / RAVLT_T2_norm['79']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['79']['mean']) / RAVLT_T2_norm['79']['sd']
 		elif 79 < df.loc[i, 'Age'] <= 84:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['84']['mean']) / RAVLT_T2_norm['84']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['84']['mean']) / RAVLT_T2_norm['84']['sd']
 		elif 84 < df.loc[i, 'Age']:
-			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T2_norm['85']['mean']) / RAVLT_T2_norm['85']['sd']
+			df.loc[i, 'RAVLT_T2_z'] = (df.loc[i, 'RAVLT_T2'] - RAVLT_T2_norm['85']['mean']) / RAVLT_T2_norm['85']['sd']
 
 		if df.loc[i, 'Age'] <= 59:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['59']['mean']) / RAVLT_T3_norm['59']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['59']['mean']) / RAVLT_T3_norm['59']['sd']
 		elif 59 < df.loc[i, 'Age'] <= 64:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['64']['mean']) / RAVLT_T3_norm['64']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['64']['mean']) / RAVLT_T3_norm['64']['sd']
 		elif 64 < df.loc[i, 'Age'] <= 69:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['69']['mean']) / RAVLT_T3_norm['69']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['69']['mean']) / RAVLT_T3_norm['69']['sd']
 		elif 69 < df.loc[i, 'Age'] <= 74:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['74']['mean']) / RAVLT_T3_norm['74']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['74']['mean']) / RAVLT_T3_norm['74']['sd']
 		elif 74 < df.loc[i, 'Age'] <= 79:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['79']['mean']) / RAVLT_T3_norm['79']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['79']['mean']) / RAVLT_T3_norm['79']['sd']
 		elif 79 < df.loc[i, 'Age'] <= 84:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['84']['mean']) / RAVLT_T3_norm['84']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['84']['mean']) / RAVLT_T3_norm['84']['sd']
 		elif 84 < df.loc[i, 'Age']:
-			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T3_norm['85']['mean']) / RAVLT_T3_norm['85']['sd']
+			df.loc[i, 'RAVLT_T3_z'] = (df.loc[i, 'RAVLT_T3'] - RAVLT_T3_norm['85']['mean']) / RAVLT_T3_norm['85']['sd']
 
 		if df.loc[i, 'Age'] <= 59:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['59']['mean']) / RAVLT_T4_norm['59']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['59']['mean']) / RAVLT_T4_norm['59']['sd']
 		elif 59 < df.loc[i, 'Age'] <= 64:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['64']['mean']) / RAVLT_T4_norm['64']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['64']['mean']) / RAVLT_T4_norm['64']['sd']
 		elif 64 < df.loc[i, 'Age'] <= 69:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['69']['mean']) / RAVLT_T4_norm['69']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['69']['mean']) / RAVLT_T4_norm['69']['sd']
 		elif 69 < df.loc[i, 'Age'] <= 74:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['74']['mean']) / RAVLT_T4_norm['74']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['74']['mean']) / RAVLT_T4_norm['74']['sd']
 		elif 74 < df.loc[i, 'Age'] <= 79:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['79']['mean']) / RAVLT_T4_norm['79']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['79']['mean']) / RAVLT_T4_norm['79']['sd']
 		elif 79 < df.loc[i, 'Age'] <= 84:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['84']['mean']) / RAVLT_T4_norm['84']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['84']['mean']) / RAVLT_T4_norm['84']['sd']
 		elif 84 < df.loc[i, 'Age']:
-			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T4_norm['85']['mean']) / RAVLT_T4_norm['85']['sd']
+			df.loc[i, 'RAVLT_T4_z'] = (df.loc[i, 'RAVLT_T4'] - RAVLT_T4_norm['85']['mean']) / RAVLT_T4_norm['85']['sd']
 
 		if df.loc[i, 'Age'] <= 59:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['59']['mean']) / RAVLT_T5_norm['59']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['59']['mean']) / RAVLT_T5_norm['59']['sd']
 		elif 59 < df.loc[i, 'Age'] <= 64:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['64']['mean']) / RAVLT_T5_norm['64']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['64']['mean']) / RAVLT_T5_norm['64']['sd']
 		elif 64 < df.loc[i, 'Age'] <= 69:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['69']['mean']) / RAVLT_T5_norm['69']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['69']['mean']) / RAVLT_T5_norm['69']['sd']
 		elif 69 < df.loc[i, 'Age'] <= 74:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['74']['mean']) / RAVLT_T5_norm['74']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['74']['mean']) / RAVLT_T5_norm['74']['sd']
 		elif 74 < df.loc[i, 'Age'] <= 79:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['79']['mean']) / RAVLT_T5_norm['79']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['79']['mean']) / RAVLT_T5_norm['79']['sd']
 		elif 79 < df.loc[i, 'Age'] <= 84:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['84']['mean']) / RAVLT_T5_norm['84']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['84']['mean']) / RAVLT_T5_norm['84']['sd']
 		elif 84 < df.loc[i, 'Age']:
-			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_Hit'] - RAVLT_T5_norm['85']['mean']) / RAVLT_T5_norm['85']['sd']
+			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['85']['mean']) / RAVLT_T5_norm['85']['sd']
 
 
 
@@ -662,10 +662,10 @@ print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'
 
 print('RAVLT, learning trials')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T1_z'].values, df.loc[df['Site']=='Th']['RAVLT_T1_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY2_Comparison']==True)]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY3_Comparison']==True)]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY4_Comparison']==True)]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['REY5_Comparison']==True)]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T2_Comparison']==True)]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T3_Comparison']==True)]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T4_Comparison']==True)]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
+print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T5_Comparison']==True)]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
 
 print('complex figure, copy and recall')
 print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
@@ -708,8 +708,69 @@ def plot_neuropsy_comparisons():
 		fn = '/home/kahwang/RDSS/tmp/fig_%s.pdf' %test
 		plt.savefig(fn)
 		plt.close()
-		
-plot_neuropsy_comparisons()
+
+#plot_neuropsy_comparisons()
+
+
+#need to melt df
+tdf = pd.melt(df, id_vars = ['Sub', 'Site'],
+	value_vars = ['TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'TMTA_z', 'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z'], value_name = 'Z Score', var_name ='Task' )
+
+
+plt.figure(figsize=[6,4])
+sns.set_context('paper', font_scale=1)
+sns.set_style('white')
+sns.set_palette("Set1")
+
+fig1=sns.pointplot(x="Task", y="Z Score", hue="Site",
+              data=tdf, dodge=.42, join=False)
+
+fig1=sns.stripplot(x="Task", y="Z Score", hue="Site",
+              data=tdf, dodge=True, alpha=.25)
+fig1.legend_.remove()
+fig1.set_ylim([-6, 6])
+fig1.set_xticklabels(['TMT \nPart B', 'Boston \nNaming', 'COWA', 'RAVLT \nRecall', 'RAVLT \nRecognition', 'TMT \nPart A', 'Complex Figure \nConstruction', 'Comeplex Figure \nRecall'], rotation=90)
+plt.xlabel('')
+#plt.show()
+plt.tight_layout()
+fn = '/home/kahwang/RDSS/tmp/neuropych.pdf'
+plt.savefig(fn)
+
+
+################################
+# Plot table of z scores to show mutlimodal impairment
+################################
+
+ddf = df[['SubID','TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
+	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
+	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z','MM_impaired']]
+tddf = ddf.loc[df['Site']=='Th']
+#invert tmtbz
+tddf['TMTB_z'] = tddf['TMTB_z']*-1
+
+# for c in ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
+# 	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+# 	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
+# 	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']:
+# 	print(c)
+# 	tddf[c].loc[tddf[c]>-1]=0
+
+
+#tddf=tddf.fillna(0)
+tddf = tddf.set_index('SubID')
+fig2 = sns.heatmap(tddf.sort_values('MM_impaired'), vmin = -6, vmax=6, center=0, cmap="coolwarm")
+fig2.set_xticklabels(['TMT Part A', 'TMT Part B', 'Boston Naming', 'COWA', 'RAVLT Recall', 'RAVLT Recognition', 'RAVLT Trial 1',
+'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5','Complex Figure Construction', 'Comeplex Figure Recall', '# Tasks Impaired'], rotation=90)
+plt.xlabel('')
+plt.ylabel('Patient')
+plt.tight_layout()
+#plotting.show()
+fn = '/home/kahwang/RDSS/tmp/tasktable.pdf'
+plt.savefig(fn)
+
+
+
 
 ########################################################################
 # Run lesion network mapping
@@ -724,111 +785,14 @@ plot_neuropsy_comparisons()
 # os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz")
 # os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/mni_icbm152_wm_tal_nlin_asym_09c_2mm.nii -prefix /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii")
 
-TMTB_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz').get_data()!=0
-BNT_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz').get_data()!=0
-COWA_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz').get_data()!=0
-COM_FIG_COPY_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz').get_data()!=0
-COM_FIG_RECALL_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz').get_data()!=0
-
-# use MNI 2mm template as base
-m = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz')
-#load WM atlas
-WM_atlas = nib.load('/home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii').get_data() > 0.5
-#WM_atlas = WM_atlas >0.5
-
-# TMTB_LESYMAP_map = resample_from_to(TMTB_LESYMAP, m).get_data()>0
-# BNT_LESYMAP_map = resample_from_to(BNT_LESYMAP, m).get_data()>0
-# COWA_LESYMAP_map = resample_from_to(COWA_LESYMAP, m).get_data()>0
-# COM_FIG_COPY_LESYMAP_map = resample_from_to(COM_FIG_COPY_LESYMAP, m).get_data()>0
-# COM_FIG_RECALL_LESYMAP_map = resample_from_to(COM_FIG_RECALL_LESYMAP, m).get_data()>0
-# from nilearn import plotting
-# plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=1)
-
-
-# get rid of WM
-TMTB_LESYMAP_map = 1* ((1 * TMTB_LESYMAP_map - 1 * WM_atlas) > 0)
-BNT_LESYMAP_map = 1* ((1 * BNT_LESYMAP_map - 1 * WM_atlas) > 0)
-COWA_LESYMAP_map = 1* ((1 * COWA_LESYMAP_map - 1 * WM_atlas) > 0)
-COM_FIG_COPY_LESYMAP_map = 1* ((1 * COM_FIG_COPY_LESYMAP_map - 1 * WM_atlas) > 0)
-COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas) > 0)
-
-# a = nilearn.image.new_img_like(m, TMTB_LESYMAP_map, copy_header=True)
-# a.to_filename('test.nii')
-#plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=0.8)
-#plotting.show()
-
-for p in df.loc[df['Site'] == 'Th']['Sub']:
-
-	if p == '4045':
-		continue #no mask yet
-	else:
-		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s.nii.gz'  %p
-		fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
-
-		df.loc[df['Sub'] == p, 'TMTB_FC'] = np.mean(fcmap[TMTB_LESYMAP_map >0])
-		df.loc[df['Sub'] == p, 'BNT_FC'] = np.mean(fcmap[BNT_LESYMAP_map >0])
-		df.loc[df['Sub'] == p, 'COWA_FC'] = np.mean(fcmap[COWA_LESYMAP_map >0])
-		df.loc[df['Sub'] == p, 'COM_FIG_COPY_FC'] = np.mean(fcmap[COM_FIG_COPY_LESYMAP_map >0])
-		df.loc[df['Sub'] == p, 'COM_FIG_RECALL_FC'] = np.mean(fcmap[COM_FIG_RECALL_LESYMAP_map >0])
-
-print(df.groupby(['TMTB_z_Impaired'])['TMTB_FC'].mean())
-print(df.groupby(['BNT_z_Impaired'])['BNT_FC'].mean())
-print(df.groupby(['COWA_z_Impaired'])['COWA_FC'].mean())
-print(df.groupby(['Complex_Figure_Copy_z_Impaired'])['COM_FIG_COPY_FC'].mean())
-print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_FC'].mean())
-
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_FC'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_FC'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_FC'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_FC'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==True)]['COWA_FC'].values, df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==False)]['COWA_FC'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==True)]['COM_FIG_COPY_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==False)]['COM_FIG_COPY_FC'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_FC'].values)
-
-
-
-### run Prep_LESYMAP_clusters.sh, this one use cortical lesion masks, separated by GM, as seeds
-lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
-
-for lesymap in lesymap_clusters:
-	fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
-	fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
-
-	for p in df.loc[df['Site'] == 'Th']['Sub']:
-		try:
-			fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
-			m = nib.load(fn).get_data()
-		except:
-			continue
-
-		df.loc[df['Sub'] == p, lesymap] = np.mean(fcmap[m>0])
-
-print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust1'].mean())
-print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust2'].mean())
-print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust1'].mean())
-print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust2'].mean())
-print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust3'].mean())
-print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust4'].mean())
-print(df.groupby(['COWA_z_Impaired'])['COWA_Clust1'].mean())
-print(df.groupby(['COWA_z_Impaired'])['COWA_Clust2'].mean())
-print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust1'].mean())
-print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust2'].mean())
-print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust3'].mean())
-print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust4'].mean())
-
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_Clust1'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_Clust1'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_Clust2'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_Clust2'].values)
-
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust1'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust1'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust2'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust2'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust3'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust3'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust4'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust4'].values)
-
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust1'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust1'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust2'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust2'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust3'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust3'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust4'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust4'].values)
-
+# TMTB_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz').get_data()!=0
+# BNT_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz').get_data()!=0
+# COWA_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz').get_data()!=0
+# COM_FIG_COPY_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz').get_data()!=0
+# COM_FIG_RECALL_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz').get_data()!=0
 
 ##### Use linear mixed effect regression model to test FC differences
+
 lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
 fcdf = pd.DataFrame()
 
@@ -841,7 +805,7 @@ for p in df.loc[df['Site'] == 'Th']['Sub']:
 	except:
 		continue
 
-	for lesymap in lesymap_clusters:
+	for lesymap in lesymap_clusters: #MGH* or Sub* for NKI subjects. NKI not done yet.
 		fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_%s_ncsreg_000_INDIV/*.nii.gz' %lesymap
 		files = glob.glob(fn)
 
@@ -896,31 +860,30 @@ fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
 
 tdf = fcdf.loc[fcdf['Task'] == 'TMTB']
 # categorical, compare impaired v unimpaired has a difference in FC
-md = smf.mixedlm("FC ~ Cluster + TMTB_z_Impaired", tdf, groups=tdf['Subject']).fit()
-print(md.summary())
-# linear relation, whether zscore has a relationship with FC
+# md = smf.mixedlm("FC ~ Cluster + TMTB_z_Impaired", tdf, groups=tdf['Subject']).fit()
+# print(md.summary())
 
+# linear relation, whether zscore has a relationship with FC
 md = smf.mixedlm("FC ~ Cluster + TMTB_z", tdf.dropna() , groups=tdf.dropna()['Subject']).fit()
 print(md.summary())
 
 
 tdf = fcdf.loc[fcdf['Task'] == 'COWA']
-md = smf.mixedlm("FC ~ Cluster + COWA_z_Impaired", tdf, groups=tdf['Subject']).fit()
-print(md.summary())
-
+# md = smf.mixedlm("FC ~ Cluster + COWA_z_Impaired", tdf, groups=tdf['Subject']).fit()
+# print(md.summary())
 md = smf.mixedlm("FC ~ Cluster + COWA_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
 print(md.summary())
 
 
 tdf = fcdf.loc[fcdf['Task'] == 'COM_FIG_RECALL']
-md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z_Impaired", tdf, groups=tdf['Subject']).fit()
-print(md.summary())
+# md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z_Impaired", tdf, groups=tdf['Subject']).fit()
+# print(md.summary())
 md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
 print(md.summary())
 
 tdf = fcdf.loc[fcdf['Task'] == 'BNT']
-md = smf.mixedlm("FC ~ Cluster + BNT_z_Impaired", tdf, groups=tdf['Subject']).fit()
-print(md.summary())
+# md = smf.mixedlm("FC ~ Cluster + BNT_z_Impaired", tdf, groups=tdf['Subject']).fit()
+# print(md.summary())
 md = smf.mixedlm("FC ~ Cluster + BNT_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
 print(md.summary())
 
@@ -1155,31 +1118,6 @@ scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']>0)]
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']>0)]['COWA_z'].values, df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']==0)]['COWA_z'].values)
 scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']>0)]['TMTB_z'].values, df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']==0)]['TMTB_z'].values)
 
-################################
-# Plot table of z scores to show mutlimodal impairment
-################################
-
-ddf = df[['SubID','TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
-	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
-	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
-	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z','MM_impaired']]
-tddf = ddf.loc[df['Site']=='Th']
-
-#invert tmtbz
-tddf['TMTB_z'] = tddf['TMTB_z']*-1
-
-for c in ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
-	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
-	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
-	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']:
-	print(c)
-	tddf[c].loc[tddf[c]>-1]=0
-
-
-#tddf=tddf.fillna(0)
-tddf = tddf.set_index('SubID')
-sns.heatmap(tddf.sort_values('MM_impaired'), vmin = -6, vmax=6, center=0, cmap="coolwarm")
-plotting.show()
 
 ### patients with MM impairments (>3):
 # 2105 2552 2092 ca085 ca093 ca104 ca105
@@ -1237,6 +1175,115 @@ sns.histplot(data=sdf, x="weight", hue="task", stat="probability", kde=True)
 plt.show()
 
 
+
+
+
+
+
+
+
+#######
+#######
+####### LEFT OVERS
+#######
+#######
+# # use MNI 2mm template as base
+# m = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz')
+# #load WM atlas
+# WM_atlas = nib.load('/home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii').get_data() > 0.5
+# #WM_atlas = WM_atlas >0.5
+#
+# # TMTB_LESYMAP_map = resample_from_to(TMTB_LESYMAP, m).get_data()>0
+# # BNT_LESYMAP_map = resample_from_to(BNT_LESYMAP, m).get_data()>0
+# # COWA_LESYMAP_map = resample_from_to(COWA_LESYMAP, m).get_data()>0
+# # COM_FIG_COPY_LESYMAP_map = resample_from_to(COM_FIG_COPY_LESYMAP, m).get_data()>0
+# # COM_FIG_RECALL_LESYMAP_map = resample_from_to(COM_FIG_RECALL_LESYMAP, m).get_data()>0
+# # from nilearn import plotting
+# # plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=1)
+#
+#
+# # get rid of WM
+# TMTB_LESYMAP_map = 1* ((1 * TMTB_LESYMAP_map - 1 * WM_atlas) > 0)
+# BNT_LESYMAP_map = 1* ((1 * BNT_LESYMAP_map - 1 * WM_atlas) > 0)
+# COWA_LESYMAP_map = 1* ((1 * COWA_LESYMAP_map - 1 * WM_atlas) > 0)
+# COM_FIG_COPY_LESYMAP_map = 1* ((1 * COM_FIG_COPY_LESYMAP_map - 1 * WM_atlas) > 0)
+# COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas) > 0)
+#
+# # a = nilearn.image.new_img_like(m, TMTB_LESYMAP_map, copy_header=True)
+# # a.to_filename('test.nii')
+# #plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=0.8)
+# #plotting.show()
+#
+# for p in df.loc[df['Site'] == 'Th']['Sub']:
+#
+# 	if p == '4045':
+# 		continue #no mask yet
+# 	else:
+# 		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s.nii.gz'  %p
+# 		fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
+#
+# 		df.loc[df['Sub'] == p, 'TMTB_FC'] = np.mean(fcmap[TMTB_LESYMAP_map >0])
+# 		df.loc[df['Sub'] == p, 'BNT_FC'] = np.mean(fcmap[BNT_LESYMAP_map >0])
+# 		df.loc[df['Sub'] == p, 'COWA_FC'] = np.mean(fcmap[COWA_LESYMAP_map >0])
+# 		df.loc[df['Sub'] == p, 'COM_FIG_COPY_FC'] = np.mean(fcmap[COM_FIG_COPY_LESYMAP_map >0])
+# 		df.loc[df['Sub'] == p, 'COM_FIG_RECALL_FC'] = np.mean(fcmap[COM_FIG_RECALL_LESYMAP_map >0])
+#
+# print(df.groupby(['TMTB_z_Impaired'])['TMTB_FC'].mean())
+# print(df.groupby(['BNT_z_Impaired'])['BNT_FC'].mean())
+# print(df.groupby(['COWA_z_Impaired'])['COWA_FC'].mean())
+# print(df.groupby(['Complex_Figure_Copy_z_Impaired'])['COM_FIG_COPY_FC'].mean())
+# print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_FC'].mean())
+#
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_FC'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_FC'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_FC'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_FC'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==True)]['COWA_FC'].values, df.loc[(df['Site']=='Th') & (df['COWA_z_Impaired']==False)]['COWA_FC'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==True)]['COM_FIG_COPY_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Copy_z_Impaired']==False)]['COM_FIG_COPY_FC'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_FC'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_FC'].values)
+#
+#
+#
+# ### run Prep_LESYMAP_clusters.sh, this one use cortical lesion masks, separated by GM, as seeds
+# lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+#
+# for lesymap in lesymap_clusters:
+# 	fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+# 	fcmap = nib.load(fcfile).get_data()[:,:,:,0,1]
+#
+# 	for p in df.loc[df['Site'] == 'Th']['Sub']:
+# 		try:
+# 			fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+# 			m = nib.load(fn).get_data()
+# 		except:
+# 			continue
+#
+# 		df.loc[df['Sub'] == p, lesymap] = np.mean(fcmap[m>0])
+#
+# print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust1'].mean())
+# print(df.groupby(['TMTB_z_Impaired'])['TMTB_Clust2'].mean())
+# print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust1'].mean())
+# print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust2'].mean())
+# print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust3'].mean())
+# print(df.groupby(['BNT_z_Impaired'])['BNT_GM_Clust4'].mean())
+# print(df.groupby(['COWA_z_Impaired'])['COWA_Clust1'].mean())
+# print(df.groupby(['COWA_z_Impaired'])['COWA_Clust2'].mean())
+# print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust1'].mean())
+# print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust2'].mean())
+# print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust3'].mean())
+# print(df.groupby(['Complex_Figure_Recall_z_Impaired'])['COM_FIG_RECALL_Clust4'].mean())
+#
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_Clust1'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_Clust1'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==True)]['TMTB_Clust2'].values, df.loc[(df['Site']=='Th') & (df['TMTB_z_Impaired']==False)]['TMTB_Clust2'].values)
+#
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust1'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust1'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust2'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust2'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust3'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust3'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==True)]['BNT_GM_Clust4'].values, df.loc[(df['Site']=='Th') & (df['BNT_z_Impaired']==False)]['BNT_GM_Clust4'].values)
+#
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust1'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust1'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust2'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust2'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust3'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust3'].values)
+# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust4'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust4'].values)
+#
 
 
 
