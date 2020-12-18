@@ -1,4 +1,3 @@
-#Test multidomain hub properties in the human thalamus
 import numpy as np
 import pandas as pd
 import nibabel as nib
@@ -16,7 +15,9 @@ from nilearn import masking
 from nilearn import plotting
 import matplotlib.pyplot as plt
 
-
+###########
+########### Test multidomain hub properties in the human thalamus
+###########
 
 def load_and_normalize_neuropsych_data():
 	########################################################################
@@ -479,7 +480,6 @@ def load_and_normalize_neuropsych_data():
 	df.to_csv('~/RDSS/tmp/data_z.csv')
 
 
-
 def Cal_lesion_size():
 	########################################################################
 	# Calculate lesion size
@@ -603,7 +603,6 @@ def determine_comparison_patients():
 	df.to_csv('~/RDSS/tmp/data_z.csv')
 
 
-
 def neuropsych_zscore():
 	########################################################################
 	# Create table of impairment
@@ -634,58 +633,18 @@ def neuropsych_zscore():
 	df.to_csv('~/RDSS/tmp/data_z.csv')
 
 
+def plot_neuropsy_indiv_comparisons():
+	# plot scores to compare groups
+	list_of_neuropsych = ['TMT Part A', 'TMT Part B', 'Boston Naming', 'COWA', 'RAVLT Delayed Recall', 'RAVLT Recognition', 'RAVLT Trial 1', ' RAVLT Trial 2',
+	'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5', 'Complex Figure Copy', 'Complex Figure Recall']
 
-if __name__ == "__main__":
+	list_of_neuropsych_z = ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z', 'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']
 
-########################################################################
-# Compare test scores between patient groups
-########################################################################
-df = pd.read_csv('~/RDSS/tmp/data_z.csv')
-
-# t tests
-print('TMTA')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values))
-
-print('TMTB')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values))
-
-print('BNT')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['BNT_Comparison']==True)]['BNT_z'].values, df.loc[df['Site']=='Th']['BNT_z'].values))
-
-print('COWA')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['COWA_Comparison']==True)]['COWA_z'].values, df.loc[df['Site']=='Th']['COWA_z'].values))
-
-print('RAVLT recall')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Delayed_Recall_z'].values, df.loc[df['Site']=='Th']['RAVLT_Delayed_Recall_z'].values))
-print('RAVLT, recog')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'].values, df.loc[df['Site']=='Th']['RAVLT_Recognition_z'].values))
-
-print('RAVLT, learning trials')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T1_z'].values, df.loc[df['Site']=='Th']['RAVLT_T1_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T2_Comparison']==True)]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T3_Comparison']==True)]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T4_Comparison']==True)]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T5_Comparison']==True)]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
-
-print('complex figure, copy and recall')
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
-print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values))
-
-
-# plot scores to compare groups
-list_of_neuropsych = ['TMT Part A', 'TMT Part B', 'Boston Naming', 'COWA', 'RAVLT Delayed Recall', 'RAVLT Recognition', 'RAVLT Trial 1', ' RAVLT Trial 2',
-'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5', 'Complex Figure Copy', 'Complex Figure Recall']
-
-list_of_neuropsych_z = ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
-'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z', 'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']
-
-list_of_neuropsych_comp = ['TMTA_Comparison', 'TMTB_Comparison', 'BNT_Comparison', 'COWA_Comparison', 'RAVLT_Delayed_Recall_Comparison', 'RAVLT_Recognition_Comparison', 'RAVLT_T1_Comparison',
-'RAVLT_T2_Comparison', 'RAVLT_T3_Comparison', 'RAVLT_T4_Comparison', 'RAVLT_T5_Comparison', 'Complex_Figure_Copy_Comparison', 'Complex_Figure_Recall_Comparison']
-
-def plot_neuropsy_comparisons():
+	list_of_neuropsych_comp = ['TMTA_Comparison', 'TMTB_Comparison', 'BNT_Comparison', 'COWA_Comparison', 'RAVLT_Delayed_Recall_Comparison', 'RAVLT_Recognition_Comparison', 'RAVLT_T1_Comparison',
+	'RAVLT_T2_Comparison', 'RAVLT_T3_Comparison', 'RAVLT_T4_Comparison', 'RAVLT_T5_Comparison', 'Complex_Figure_Copy_Comparison', 'Complex_Figure_Recall_Comparison']
 
 	#Need to only plot included comparison patients
-
 	for i, test in enumerate(list_of_neuropsych_z):
 		plt.figure(figsize=[2.4,3])
 		sns.set_context('paper', font_scale=1)
@@ -694,9 +653,9 @@ def plot_neuropsy_comparisons():
 
 		tdf = df.loc[df[list_of_neuropsych_comp[i]]==True]
 		fig1=sns.pointplot(x="Site", y=test, join=False, hue='Site', dodge=False,
-		              data=tdf)
+					  data=tdf)
 		fig1=sns.stripplot(x="Site", y=test,
-		              data=tdf, alpha = .4)
+					  data=tdf, alpha = .4)
 
 		fig1.set_xticklabels(['Thalamic \nPatients', 'Comparison \nPatients'])
 		#fig1.set_ylim([-3, 7])
@@ -709,183 +668,290 @@ def plot_neuropsy_comparisons():
 		plt.savefig(fn)
 		plt.close()
 
-#plot_neuropsy_comparisons()
+
+def plot_neuropsy_comparisons():
+	#need to melt df
+	tdf = pd.melt(df, id_vars = ['Sub', 'Site'],
+		value_vars = ['TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'TMTA_z', 'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z'], value_name = 'Z Score', var_name ='Task' )
 
 
-#need to melt df
-tdf = pd.melt(df, id_vars = ['Sub', 'Site'],
-	value_vars = ['TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'TMTA_z', 'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z'], value_name = 'Z Score', var_name ='Task' )
+	plt.figure(figsize=[6,4])
+	sns.set_context('paper', font_scale=1)
+	sns.set_style('white')
+	sns.set_palette("Set1")
+
+	fig1=sns.pointplot(x="Task", y="Z Score", hue="Site",
+				  data=tdf, dodge=.42, join=False)
+
+	fig1=sns.stripplot(x="Task", y="Z Score", hue="Site",
+				  data=tdf, dodge=True, alpha=.25)
+	fig1.legend_.remove()
+	fig1.set_ylim([-6, 6])
+	fig1.set_xticklabels(['TMT \nPart B', 'Boston \nNaming', 'COWA', 'RAVLT \nRecall', 'RAVLT \nRecognition', 'TMT \nPart A', 'Complex Figure \nConstruction', 'Comeplex Figure \nRecall'], rotation=90)
+	plt.xlabel('')
+	#plt.show()
+	plt.tight_layout()
+	fn = '/home/kahwang/RDSS/tmp/neuropych.pdf'
+	plt.savefig(fn)
 
 
-plt.figure(figsize=[6,4])
-sns.set_context('paper', font_scale=1)
-sns.set_style('white')
-sns.set_palette("Set1")
+def plot_neuropsych_table():
+	ddf = df[['SubID','TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
+		'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+		'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
+		'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z','MM_impaired']]
+	tddf = ddf.loc[df['Site']=='Th']
+	#invert tmtbz
+	tddf['TMTB_z'] = tddf['TMTB_z']*-1
 
-fig1=sns.pointplot(x="Task", y="Z Score", hue="Site",
-              data=tdf, dodge=.42, join=False)
-
-fig1=sns.stripplot(x="Task", y="Z Score", hue="Site",
-              data=tdf, dodge=True, alpha=.25)
-fig1.legend_.remove()
-fig1.set_ylim([-6, 6])
-fig1.set_xticklabels(['TMT \nPart B', 'Boston \nNaming', 'COWA', 'RAVLT \nRecall', 'RAVLT \nRecognition', 'TMT \nPart A', 'Complex Figure \nConstruction', 'Comeplex Figure \nRecall'], rotation=90)
-plt.xlabel('')
-#plt.show()
-plt.tight_layout()
-fn = '/home/kahwang/RDSS/tmp/neuropych.pdf'
-plt.savefig(fn)
+	# for c in ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
+	# 	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
+	# 	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
+	# 	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']:
+	# 	print(c)
+	# 	tddf[c].loc[tddf[c]>-1]=0
 
 
-################################
-# Plot table of z scores to show mutlimodal impairment
-################################
-
-ddf = df[['SubID','TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
-	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
-	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
-	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z','MM_impaired']]
-tddf = ddf.loc[df['Site']=='Th']
-#invert tmtbz
-tddf['TMTB_z'] = tddf['TMTB_z']*-1
-
-# for c in ['TMTA_z', 'TMTB_z', 'BNT_z', 'COWA_z',
-# 	'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'RAVLT_T1_z',
-# 	'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
-# 	'Complex_Figure_Copy_z', 'Complex_Figure_Recall_z']:
-# 	print(c)
-# 	tddf[c].loc[tddf[c]>-1]=0
+	#tddf=tddf.fillna(0)
+	tddf = tddf.set_index('SubID')
+	fig2 = sns.heatmap(tddf.sort_values('MM_impaired'), vmin = -6, vmax=6, center=0, cmap="coolwarm")
+	fig2.set_xticklabels(['TMT Part A', 'TMT Part B', 'Boston Naming', 'COWA', 'RAVLT Recall', 'RAVLT Recognition', 'RAVLT Trial 1',
+	'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5','Complex Figure Construction', 'Comeplex Figure Recall', '# Tasks Impaired'], rotation=90)
+	plt.xlabel('')
+	plt.ylabel('Patient')
+	plt.tight_layout()
+	#plotting.show()
+	fn = '/home/kahwang/RDSS/tmp/tasktable.pdf'
+	plt.savefig(fn)
 
 
-#tddf=tddf.fillna(0)
-tddf = tddf.set_index('SubID')
-fig2 = sns.heatmap(tddf.sort_values('MM_impaired'), vmin = -6, vmax=6, center=0, cmap="coolwarm")
-fig2.set_xticklabels(['TMT Part A', 'TMT Part B', 'Boston Naming', 'COWA', 'RAVLT Recall', 'RAVLT Recognition', 'RAVLT Trial 1',
-'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5','Complex Figure Construction', 'Comeplex Figure Recall', '# Tasks Impaired'], rotation=90)
-plt.xlabel('')
-plt.ylabel('Patient')
-plt.tight_layout()
-#plotting.show()
-fn = '/home/kahwang/RDSS/tmp/tasktable.pdf'
-plt.savefig(fn)
+def run_LESYMAP_fc():
+
+	lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+	fcdf = pd.DataFrame()
+	i=0
+	for p in df.loc[df['Site'] == 'Th']['Sub']:
+		try:
+			fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+			m = nib.load(fn).get_data()
+		except:
+			continue
+
+		for lesymap in lesymap_clusters: #MGH* or Sub* for NKI subjects. NKI not done yet.
+			fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_%s_ncsreg_000_INDIV/*.nii.gz' %lesymap
+			files = glob.glob(fn)
+
+			s = 0
+			for f in files:
+				fcmap = nib.load(f).get_data()
+				fcdf.loc[i, 'Subject'] = str(s)
+				fcdf.loc[i, 'Patient'] = p
+				fcdf.loc[i, 'Cluster'] = lesymap
+				fcdf.loc[i, 'FC'] = np.mean(fcmap[m>0])
+				fcdf.loc[i, 'TMTB_z_Impaired'] = df.loc[df['Sub'] == p]['TMTB_z_Impaired'].values[0]
+				fcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
+				fcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
+				fcdf.loc[i, 'Complex_Figure_Recall_z_Impaired'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z_Impaired'].values[0]
+				fcdf.loc[i, 'TMTB_z'] = df.loc[df['Sub'] == p]['TMTB_z'].values[0]
+				fcdf.loc[i, 'BNT_z'] = df.loc[df['Sub'] == p]['BNT_z'].values[0]
+				fcdf.loc[i, 'COWA_z'] = df.loc[df['Sub'] == p]['COWA_z'].values[0]
+				fcdf.loc[i, 'Complex_Figure_Recall_z'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z'].values[0]
+
+				if lesymap == 'BNT_GM_Clust1':
+					fcdf.loc[i, 'Task'] = 'BNT'
+				if lesymap == 'BNT_GM_Clust2':
+					fcdf.loc[i, 'Task'] = 'BNT'
+				if lesymap == 'BNT_GM_Clust3':
+					fcdf.loc[i, 'Task'] = 'BNT'
+				if lesymap == 'BNT_GM_Clust4':
+					fcdf.loc[i, 'Task'] = 'BNT'
+				if lesymap == 'COM_FIG_RECALL_Clust1':
+					fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+				if lesymap == 'COM_FIG_RECALL_Clust2':
+					fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+				if lesymap == 'COM_FIG_RECALL_Clust3':
+					fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+				if lesymap == 'COM_FIG_RECALL_Clust4':
+					fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
+				if lesymap == 'COWA_Clust1':
+					fcdf.loc[i, 'Task'] = 'COWA'
+				if lesymap == 'COWA_Clust2':
+					fcdf.loc[i, 'Task'] = 'COWA'
+				if lesymap == 'TMTB_Clust1':
+					fcdf.loc[i, 'Task'] = 'TMTB'
+				if lesymap == 'TMTB_Clust2':
+					fcdf.loc[i, 'Task'] = 'TMTB'
+				i = i+1
+				s = s+1
+
+	fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
 
 
+if __name__ == "__main__":
+
+	########################################################################
+	# Figure 1. Compare test scores between patient groups
+	########################################################################
+
+	###################
+	# Test scores
+
+	df = pd.read_csv('~/RDSS/tmp/data_z.csv')
+
+	# t tests
+	print('TMTA')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values))
+
+	print('TMTB')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTB_z'].values, df.loc[df['Site']=='Th']['TMTB_z'].values))
+
+	print('BNT')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['BNT_Comparison']==True)]['BNT_z'].values, df.loc[df['Site']=='Th']['BNT_z'].values))
+
+	print('COWA')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['COWA_Comparison']==True)]['COWA_z'].values, df.loc[df['Site']=='Th']['COWA_z'].values))
+
+	print('RAVLT recall')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Delayed_Recall_z'].values, df.loc[df['Site']=='Th']['RAVLT_Delayed_Recall_z'].values))
+	print('RAVLT, recog')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'].values, df.loc[df['Site']=='Th']['RAVLT_Recognition_z'].values))
+
+	print('RAVLT, learning trials')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T1_z'].values, df.loc[df['Site']=='Th']['RAVLT_T1_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T2_Comparison']==True)]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T3_Comparison']==True)]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T4_Comparison']==True)]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T5_Comparison']==True)]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
+
+	print('complex figure, copy and recall')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values))
+
+	#plot_neuropsy_indiv_comparisons()
+	#plot_neuropsy_comparisons()
+
+	###################
+	# plot lesion overlap
 
 
-########################################################################
-# Run lesion network mapping
-########################################################################
-### run Map_Network.sh, this one use thalamus lesion mask at seed and check overlap with cortical LESYMAP masks
+	################################
+	# Figure 2.  Plot table of z scores to show mutlimodal impairment
+	################################
 
-#resample LESYMAP output from 1mm grid to 2mm grid (FC maps in 2mm grid)
-# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz")
-# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz")
-# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz")
-# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz")
-# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz")
-# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/mni_icbm152_wm_tal_nlin_asym_09c_2mm.nii -prefix /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii")
+	#plot_neuropsych_table()
 
-# TMTB_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz').get_data()!=0
-# BNT_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz').get_data()!=0
-# COWA_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz').get_data()!=0
-# COM_FIG_COPY_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz').get_data()!=0
-# COM_FIG_RECALL_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz').get_data()!=0
+	########################################################################
+	# Fig 3, LESYMAP lesion network
+	########################################################################
 
-##### Use linear mixed effect regression model to test FC differences
+	########################################################################
+	# Plot the LESYMAP grey matter mask clusters
+	# First load all the lesymap, and get rid of white matter overlap
 
-lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
-fcdf = pd.DataFrame()
+	# use MNI 2mm template as base
+	m = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz')
 
-i=0
+	#load WM atlas
+	WM_atlas = nib.load('/home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii').get_data() > 0.5
 
-for p in df.loc[df['Site'] == 'Th']['Sub']:
-	try:
-		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
-		m = nib.load(fn).get_data()
-	except:
-		continue
+	#load each LESYMAP. Ones not loaded don't have GM clusters.
+	TMTB_LESYMAP_map = nib.load('/home/kahwang/Trail_B_and_A_Difference/stat_img_2mm.nii.gz').get_data()!=0
+	BNT_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz').get_data()!=0
+	COWA_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz').get_data()!=0
+	COM_FIG_RECALL_LESYMAP_map = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz').get_data()!=0
 
-	for lesymap in lesymap_clusters: #MGH* or Sub* for NKI subjects. NKI not done yet.
-		fn = '/data/backed_up/shared/Tha_Lesion_Mapping/MGH*/seed_corr_%s_ncsreg_000_INDIV/*.nii.gz' %lesymap
-		files = glob.glob(fn)
+	# get rid of WM
+	TMTB_LESYMAP_map = 1* ((1 * TMTB_LESYMAP_map - 1 * WM_atlas) > 0)
+	BNT_LESYMAP_map = 1* ((1 * BNT_LESYMAP_map - 1 * WM_atlas) > 0)
+	COWA_LESYMAP_map = 1* ((1 * COWA_LESYMAP_map - 1 * WM_atlas) > 0)
+	COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas) > 0)
 
-		s = 0
-		for f in files:
-			fcmap = nib.load(f).get_data()
-			fcdf.loc[i, 'Subject'] = str(s)
-			fcdf.loc[i, 'Patient'] = p
-			fcdf.loc[i, 'Cluster'] = lesymap
-			fcdf.loc[i, 'FC'] = np.mean(fcmap[m>0])
-			fcdf.loc[i, 'TMTB_z_Impaired'] = df.loc[df['Sub'] == p]['TMTB_z_Impaired'].values[0]
-			fcdf.loc[i, 'BNT_z_Impaired'] = df.loc[df['Sub'] == p]['BNT_z_Impaired'].values[0]
-			fcdf.loc[i, 'COWA_z_Impaired'] = df.loc[df['Sub'] == p]['COWA_z_Impaired'].values[0]
-			fcdf.loc[i, 'Complex_Figure_Recall_z_Impaired'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z_Impaired'].values[0]
-			fcdf.loc[i, 'TMTB_z'] = df.loc[df['Sub'] == p]['TMTB_z'].values[0]
-			fcdf.loc[i, 'BNT_z'] = df.loc[df['Sub'] == p]['BNT_z'].values[0]
-			fcdf.loc[i, 'COWA_z'] = df.loc[df['Sub'] == p]['COWA_z'].values[0]
-			fcdf.loc[i, 'Complex_Figure_Recall_z'] = df.loc[df['Sub'] == p]['Complex_Figure_Recall_z'].values[0]
+	TMTB_LESYMAP_GM_nii = nilearn.image.new_img_like(m, TMTB_LESYMAP_map, copy_header=True)
+	BNT_LESYMAP_GM_nii = nilearn.image.new_img_like(m, BNT_LESYMAP_map, copy_header=True)
+	COWA_LESYMAP_GM_nii = nilearn.image.new_img_like(m, COWA_LESYMAP_map, copy_header=True)
+	COM_FIG_RECALL_LESYMAP_GM_nii = nilearn.image.new_img_like(m, COM_FIG_RECALL_LESYMAP_map, copy_header=True)
 
-			if lesymap == 'BNT_GM_Clust1':
-				fcdf.loc[i, 'Task'] = 'BNT'
-			if lesymap == 'BNT_GM_Clust2':
-				fcdf.loc[i, 'Task'] = 'BNT'
-			if lesymap == 'BNT_GM_Clust3':
-				fcdf.loc[i, 'Task'] = 'BNT'
-			if lesymap == 'BNT_GM_Clust4':
-				fcdf.loc[i, 'Task'] = 'BNT'
-			if lesymap == 'COM_FIG_RECALL_Clust1':
-				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
-			if lesymap == 'COM_FIG_RECALL_Clust2':
-				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
-			if lesymap == 'COM_FIG_RECALL_Clust3':
-				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
-			if lesymap == 'COM_FIG_RECALL_Clust4':
-				fcdf.loc[i, 'Task'] = 'COM_FIG_RECALL'
-			if lesymap == 'COWA_Clust1':
-				fcdf.loc[i, 'Task'] = 'COWA'
-			if lesymap == 'COWA_Clust2':
-				fcdf.loc[i, 'Task'] = 'COWA'
-			if lesymap == 'TMTB_Clust1':
-				fcdf.loc[i, 'Task'] = 'TMTB'
-			if lesymap == 'TMTB_Clust2':
-				fcdf.loc[i, 'Task'] = 'TMTB'
+	mni_template = nib.load('/data/backed_up/shared/standard/mni_icbm152_nlin_asym_09c/mni_icbm152_t1_tal_nlin_asym_09c_brain.nii')
 
-			i = i+1
-			s = s+1
+	img = plotting.plot_stat_map(TMTB_LESYMAP_GM_nii, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = False, black_bg=False, cmap='bwr')
+	img.savefig('/home/kahwang/RDSS/tmp/TMTB_LESYMAP_GM_nii.png')
+	#plotting.show()
+	img = plotting.plot_stat_map(BNT_LESYMAP_GM_nii, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = False, black_bg=False, cmap='bwr')
+	img.savefig('/home/kahwang/RDSS/tmp/BNT_LESYMAP_GM_nii.png')
+	# plotting.show()
+	img =plotting.plot_stat_map(COWA_LESYMAP_GM_nii, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = False, black_bg=False, cmap='bwr')
+	img.savefig('/home/kahwang/RDSS/tmp/COWA_LESYMAP_GM_nii.png')
+	#plotting.show()
+	img =plotting.plot_stat_map(COM_FIG_RECALL_LESYMAP_GM_nii, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = False, black_bg=False, cmap='bwr')
+	img.savefig('/home/kahwang/RDSS/tmp/COM_FIG_RECALL_LESYMAP_GM_nii.png')
+	#plotting.show()
 
-fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
-
-# statsmodel, subject with random intercept
-# https://www.statsmodels.org/stable/mixed_linear.html,
-
-tdf = fcdf.loc[fcdf['Task'] == 'TMTB']
-# categorical, compare impaired v unimpaired has a difference in FC
-# md = smf.mixedlm("FC ~ Cluster + TMTB_z_Impaired", tdf, groups=tdf['Subject']).fit()
-# print(md.summary())
-
-# linear relation, whether zscore has a relationship with FC
-md = smf.mixedlm("FC ~ Cluster + TMTB_z", tdf.dropna() , groups=tdf.dropna()['Subject']).fit()
-print(md.summary())
+	# Plot overlap. Looks like COWA and BNT has overlapping clusters in LIFG, duh.
+	LESSYMAP_GM_overlap = TMTB_LESYMAP_map + BNT_LESYMAP_map + COWA_LESYMAP_map + COM_FIG_RECALL_LESYMAP_map
+	LESSYMAP_GM_overlap_nii = nilearn.image.new_img_like(m, LESSYMAP_GM_overlap, copy_header = True)
+	plotting.plot_stat_map(LESSYMAP_GM_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=8, colorbar = True, black_bg=False, cmap='bwr')
+	#plotting.show()
 
 
-tdf = fcdf.loc[fcdf['Task'] == 'COWA']
-# md = smf.mixedlm("FC ~ Cluster + COWA_z_Impaired", tdf, groups=tdf['Subject']).fit()
-# print(md.summary())
-md = smf.mixedlm("FC ~ Cluster + COWA_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
-print(md.summary())
+	#############################################
+	### run Map_Network.sh, this one use thalamus lesion mask at seed and check overlap with cortical LESYMAP masks
+	### Use linear mixed effect regression model to test FC differences
+
+	#run_LESYMAP_fc()
+
+	########### fit lme models
+	fcdf = pd.read_csv('~/RDSS/tmp/fcdata.csv')
+
+	# statsmodel, subject with random intercept, random slope for each subj
+	# https://www.statsmodels.org/stable/mixed_linear.html,
+	# linear relation, whether zscore has a relationship with FC
+	# the nature of the relation within  was assessed with a linear mixed effects linear regression
+	# and showed that (peak: β = −0.013, 95% CI = [−0.019, −0.006], P < 0.001).
+
+	tdf = fcdf.loc[fcdf['Task'] == 'TMTB']
+	md_TMTb = smf.mixedlm("TMTB_z ~ FC", tdf.dropna() , re_formula="FC",groups=tdf.dropna()['Subject']).fit()
+	print(md_TMTb.summary())
+
+	tdf = fcdf.loc[fcdf['Task'] == 'COWA']
+	# md = smf.mixedlm("FC ~  + COWA_z_Impaired", tdf, groups=tdf['Subject']).fit()
+	# print(md.summary())
+	md_COWA = smf.mixedlm("COWA_z ~ FC", tdf.dropna(), re_formula="FC",groups=tdf.dropna()['Subject']).fit()
+	print(md_COWA.summary())
+
+	tdf = fcdf.loc[fcdf['Task'] == 'COM_FIG_RECALL']
+	# md = smf.mixedlm("FC ~  + Complex_Figure_Recall_z_Impaired", tdf, groups=tdf['Subject']).fit()
+	# print(md.summary())
+	md_CF = smf.mixedlm("Complex_Figure_Recall_z ~  FC", tdf.dropna(), re_formula="FC",groups=tdf.dropna()['Subject']).fit()
+	print(md_CF.summary())
+
+	tdf = fcdf.loc[fcdf['Task'] == 'BNT']
+	# md = smf.mixedlm("FC ~  + BNT_z_Impaired", tdf, groups=tdf['Subject']).fit()
+	# print(md.summary())
+	md_BNT = smf.mixedlm("BNT_z ~  FC", tdf.dropna(), re_formula="FC",groups=tdf.dropna()['Subject']).fit()
+	print(md_BNT.summary())
+
+	#### plot coef and CI
+	coef_df = pd.DataFrame()
+	coef_df.loc[0, 'Coefficients'] = md_TMTb.params['FC']
+	coef_df.loc[0, 'errors'] = md_TMTb.params['FC'] - md_TMTb.conf_int()[0]['FC']
+	coef_df.loc[1, 'Coefficients'] = md_COWA.params['FC']
+	coef_df.loc[1, 'errors'] = md_COWA.params['FC'] - md_COWA.conf_int()[0]['FC']
+	coef_df.loc[2, 'Coefficients'] = md_BNT.params['FC']
+	coef_df.loc[2, 'errors'] = md_BNT.params['FC'] - md_BNT.conf_int()[0]['FC']
+	coef_df.loc[3, 'Coefficients'] = md_CF.params['FC']
+	coef_df.loc[3, 'errors'] = md_CF.params['FC'] - md_CF.conf_int()[0]['FC']
+	coef_df.loc[0, 'Task']	= 'TMT part B'
+	coef_df.loc[1, 'Task']	= 'COWA'
+	coef_df.loc[2, 'Task']	= 'Boston Naming'
+	coef_df.loc[3, 'Task']	= 'Complex Figure Recall'
+
+	coef_df.plot(x='Task', y='Coefficients', xerr= 'errors', kind='barh', legend = False, figsize=(4,2))
+	plt.xlabel('Coefficient Estimate')
+	plt.tight_layout()
+	fn = '/home/kahwang/RDSS/tmp/fcregcoef.pdf'
+	plt.savefig(fn)
 
 
-tdf = fcdf.loc[fcdf['Task'] == 'COM_FIG_RECALL']
-# md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z_Impaired", tdf, groups=tdf['Subject']).fit()
-# print(md.summary())
-md = smf.mixedlm("FC ~ Cluster + Complex_Figure_Recall_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
-print(md.summary())
-
-tdf = fcdf.loc[fcdf['Task'] == 'BNT']
-# md = smf.mixedlm("FC ~ Cluster + BNT_z_Impaired", tdf, groups=tdf['Subject']).fit()
-# print(md.summary())
-md = smf.mixedlm("FC ~ Cluster + BNT_z", tdf.dropna(), groups=tdf.dropna()['Subject']).fit()
-print(md.summary())
 
 ########################################################################
 # Calculate participation coef for each lesion mask,
@@ -1187,27 +1253,7 @@ plt.show()
 ####### LEFT OVERS
 #######
 #######
-# # use MNI 2mm template as base
-# m = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz')
-# #load WM atlas
-# WM_atlas = nib.load('/home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii').get_data() > 0.5
-# #WM_atlas = WM_atlas >0.5
-#
-# # TMTB_LESYMAP_map = resample_from_to(TMTB_LESYMAP, m).get_data()>0
-# # BNT_LESYMAP_map = resample_from_to(BNT_LESYMAP, m).get_data()>0
-# # COWA_LESYMAP_map = resample_from_to(COWA_LESYMAP, m).get_data()>0
-# # COM_FIG_COPY_LESYMAP_map = resample_from_to(COM_FIG_COPY_LESYMAP, m).get_data()>0
-# # COM_FIG_RECALL_LESYMAP_map = resample_from_to(COM_FIG_RECALL_LESYMAP, m).get_data()>0
-# # from nilearn import plotting
-# # plotting.plot_glass_brain(resample_from_to(TMTB_LESYMAP, m), threshold=1)
-#
-#
-# # get rid of WM
-# TMTB_LESYMAP_map = 1* ((1 * TMTB_LESYMAP_map - 1 * WM_atlas) > 0)
-# BNT_LESYMAP_map = 1* ((1 * BNT_LESYMAP_map - 1 * WM_atlas) > 0)
-# COWA_LESYMAP_map = 1* ((1 * COWA_LESYMAP_map - 1 * WM_atlas) > 0)
-# COM_FIG_COPY_LESYMAP_map = 1* ((1 * COM_FIG_COPY_LESYMAP_map - 1 * WM_atlas) > 0)
-# COM_FIG_RECALL_LESYMAP_map = 1* ((1 * COM_FIG_RECALL_LESYMAP_map - 1 * WM_atlas) > 0)
+
 #
 # # a = nilearn.image.new_img_like(m, TMTB_LESYMAP_map, copy_header=True)
 # # a.to_filename('test.nii')
@@ -1285,8 +1331,25 @@ plt.show()
 # scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==True)]['COM_FIG_RECALL_Clust4'].values, df.loc[(df['Site']=='Th') & (df['Complex_Figure_Recall_z_Impaired']==False)]['COM_FIG_RECALL_Clust4'].values)
 #
 
+#resample LESYMAP output from 1mm grid to 2mm grid (FC maps in 2mm grid)
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz -prefix /home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img_2mm.nii.gz")
+# os.system("3dresample -master /data/backed_up/shared/Tha_Lesion_Mapping/MNI_brainamsk_2mm.nii.gz -inset /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/mni_icbm152_wm_tal_nlin_asym_09c_2mm.nii -prefix /home/kahwang/bsh/standard/mni_icbm152_nlin_asym_09c/wm_2mm.nii")
 
 
+
+	#### lmplot
+	# melt
+	# tdf = pd.melt(fcdf, id_vars = ['Subject', 'FC'],
+	# 	value_vars = ['TMTB_z', 'BNT_z', 'COWA_z', 'Complex_Figure_Recall_z'], value_name = 'Z Score', var_name ='Task')
+	#
+	# g = sns.lmplot(x="FC", y="Z Score", col="Task", hue='Task', sharex = False,
+	#                data=tdf, height=6, aspect=.4, x_jitter=.1, ci=None)
+	# #g.set(ylim=(-0.1, 0.1))
+	# plt.show()
 
 
 #end of line
