@@ -786,15 +786,91 @@ def run_LESYMAP_fc():
 
 	fcdf.to_csv('~/RDSS/tmp/fcdata.csv')
 
+def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
+	''' function to do partial correlation bewteen subcortical and cortical ROI timeseries.
+	Cortical signals (not subcortical) will be removed from subcortical and cortical ROIs,
+	and then pairwise correlation will be calculated bewteen subcortical and cortical ROIs
+	(but not between subcortico-subcortical or cortico-cortical ROIs).
+	This partial correlation/regression approach is for cleaning subcortico-cortical
+	conectivity, which seems to be heavily influenced by a global noise.
+	usage: pcorr_mat = pcorr_subcortico-cortical(subcortical_ts, cortical_ts)
+	----
+	Parameters
+	----
+	subcortical_ts: txt file of timeseries data from subcortical ROIs/voxels, each row is an ROI
+	cortical_ts: txt file of timeseries data from cortical ROIs, each row is an ROI
+	pcorr_mat: output partial correlation matrix
+	'''
+	from scipy import stats, linalg
+	from sklearn.decomposition import PCA
+
+	# # transpose so that column is ROI, this is because output from 3dNetcorr is row-based.
+	# subcortical_ts = subcortical_ts.T
+	# cortical_ts = cortical_ts.T
+	cortical_ts[np.isnan(cortical_ts)]=0
+	subcortical_ts[np.isnan(subcortical_ts)]=0
+
+	# check length of data
+	assert cortical_ts.shape[0] == subcortical_ts.shape[0]
+	num_vol = cortical_ts.shape[0]
+
+	#first check that the dimension is appropriate
+	num_cort = cortical_ts.shape[1]
+	num_subcor = subcortical_ts.shape[1]
+	num_total = num_cort + num_subcor
+
+	#maximum number of regressors that we can use
+	max_num_components = int(num_vol/20)
+	if max_num_components > num_cort:
+		max_num_components = num_cort-1
+
+	pcorr_mat = np.zeros((num_total, num_total), dtype=np.float)
+
+	for j in range(num_cort):
+		k = np.ones(num_cort, dtype=np.bool)
+		k[j] = False
+
+		#use PCA to reduce cortical data dimensionality
+		pca = PCA(n_components=max_num_components)
+		pca.fit(cortical_ts[:,k])
+		reduced_cortical_ts = pca.fit_transform(cortical_ts[:,k])
+
+		#print("Amount of varaince explanined after PCA: %s" %np.sum(pca.explained_variance_ratio_))
+
+		# fit cortical signal to cortical ROI TS, get betas
+		beta_cortical = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,j])[0]
+
+		#get residuals
+		res_cortical = cortical_ts[:, j] - reduced_cortical_ts.dot(beta_cortical)
+
+		for i in range(num_subcor):
+			# fit cortical signal to subcortical ROI TS, get betas
+			beta_subcortical = linalg.lstsq(reduced_cortical_ts, subcortical_ts[:,i])[0]
+
+			#get residuals
+			res_subcortical = subcortical_ts[:, i] - reduced_cortical_ts.dot(beta_subcortical)
+
+			#partial correlation
+			pcorr_mat[i+num_cort, j] = stats.pearsonr(res_cortical, res_subcortical)[0]
+			pcorr_mat[j,i+num_cort ] = pcorr_mat[i+num_cort, j]
+
+	return pcorr_mat
+
 
 if __name__ == "__main__":
 
 	########################################################################
 	# Figure 1. Compare test scores between patient groups
 	########################################################################
+	### Prep dataframe through steps:
+
+	#load_and_normalize_neuropsych_data()
+	#Cal_lesion_size()
+	#determine_comparison_patients()
+	#neuropsych_zscore()
 
 	###################
-	# Test scores
+	# compare test scores
 
 	df = pd.read_csv('~/RDSS/tmp/data_z.csv')
 
@@ -852,6 +928,9 @@ if __name__ == "__main__":
 		lesion_overlap_nii = nilearn.image.new_img_like(h, m)
 		lesion_overlap_nii.to_filename('lesion_overlap.nii')
 
+		return lesion_overlap_nii
+
+	#lesion_overlap_nii = draw_lesion_overlap()
 	#plotting.plot_stat_map(lesion_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=5, colorbar = False, black_bg=False, cmap='gist_ncar')
 	#plotting.show()
 
@@ -860,6 +939,46 @@ if __name__ == "__main__":
 	################################
 
 	#plot_neuropsych_table()
+
+	##### Now draw lesions overlap for patients with and without multimodal impairment
+	##### plot lesion masks for these subjects
+	### patients with MM impairments (>3):
+	# 2105 2552 2092 ca085 ca093 ca104 ca105 1692 1830 3049
+	# 1692: COWA, RAVLT recall, learn
+	# 1830: TMTB RAVLT Recog, learn
+	# 3049: TMTB COWA, learn
+	# 2105: TMTB, COWA, RVLT recall,
+	# 2552: TMTB, BNT, COWA, RVLT recall
+	# 2092: TMTB, COWA, RVLT recall, RVLT recog, RVLT, learn.
+	# ca085: BNT, RVLT recall, Com Figure Copy, Fig COM_FIG_RECALL
+	# CA093, BNT, RVLT recog, RVLT learn, com fig copy, com fig COM_FIG_RECAL
+	# ca104, TMTB, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recall
+	# ca105, TMTB, COWA, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recal
+
+	m=0
+	for s in ['2105', '2552', '2092', 'ca085', 'ca093', 'ca104', 'ca105', '1692', '1830', 3049]:
+
+		fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+		m = m + nib.load(fn).get_data()
+
+	h = nib.load('/home/kahwang/0.5mm/0902.nii.gz')
+	mmlesion_overlap_nii = nilearn.image.new_img_like(h, m)
+	mmlesion_overlap_nii.to_filename('mmlesion_overlap.nii.gz')
+
+	m=0
+	for s in ['1809', '1105', '2781', '0902', '3184', 'ca018', 'ca041', '4036', '4032', '4041']:
+
+		fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+		m = m + nib.load(fn).get_data()
+
+	h = nib.load('/home/kahwang/0.5mm/0902.nii.gz')
+	smlesion_overlap_nii = nilearn.image.new_img_like(h, m)
+	smlesion_overlap_nii.to_filename('smlesion_overlap.nii.gz')
+
+	#lesion_dff_nii = nilearn.image.new_img_like(h, 1*(mmlesion_overlap_nii.get_data()>0) - 1*(smlesion_overlap_nii.get_data()>0))
+	#lesion_dff_nii.to_filename('lesion_dff.nii.gz')
+	#plotting.plot_stat_map(lesion_dff_nii, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = False, black_bg=False, cmap='bwr')
+
 
 	########################################################################
 	# Fig 3, LESYMAP lesion network
@@ -910,7 +1029,7 @@ if __name__ == "__main__":
 	# Plot overlap. Looks like COWA and BNT has overlapping clusters in LIFG, duh.
 	LESSYMAP_GM_overlap = TMTB_LESYMAP_map + BNT_LESYMAP_map + COWA_LESYMAP_map + COM_FIG_RECALL_LESYMAP_map
 	LESSYMAP_GM_overlap_nii = nilearn.image.new_img_like(m, LESSYMAP_GM_overlap, copy_header = True)
-	plotting.plot_stat_map(LESSYMAP_GM_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=8, colorbar = True, black_bg=False, cmap='bwr')
+	#plotting.plot_stat_map(LESSYMAP_GM_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=8, colorbar = True, black_bg=False, cmap='bwr')
 	#plotting.show()
 
 
@@ -919,6 +1038,62 @@ if __name__ == "__main__":
 	### Use linear mixed effect regression model to test FC differences
 
 	#run_LESYMAP_fc()
+
+	########### plot lessyamp_FC in thalamus
+	MGH_groupFC_BNT_GM_Clust1_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_BNT_GM_Clust1_ncsreg.nii.gz').get_data()
+	MGH_groupFC_BNT_GM_Clust2_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_BNT_GM_Clust2_ncsreg.nii.gz').get_data()
+	MGH_groupFC_BNT_GM_Clust3_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_BNT_GM_Clust3_ncsreg.nii.gz').get_data()
+	MGH_groupFC_BNT_GM_Clust4_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_BNT_GM_Clust4_ncsreg.nii.gz').get_data()
+	MGH_groupFC_COM_FIG_RECALL_Clust1_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_COM_FIG_RECALL_Clust1_ncsreg.nii.gz').get_data()
+	MGH_groupFC_COM_FIG_RECALL_Clust2_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_COM_FIG_RECALL_Clust2_ncsreg.nii.gz').get_data()
+	MGH_groupFC_COM_FIG_RECALL_Clust3_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_COM_FIG_RECALL_Clust3_ncsreg.nii.gz').get_data()
+	MGH_groupFC_COM_FIG_RECALL_Clust4_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_COM_FIG_RECALL_Clust4_ncsreg.nii.gz').get_data()
+	MGH_groupFC_COWA_Clust1_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_COWA_Clust1_ncsreg.nii.gz').get_data()
+	MGH_groupFC_COWA_Clust2_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_COWA_Clust2_ncsreg.nii.gz').get_data()
+	MGH_groupFC_TMTB_Clust1_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_TMTB_Clust1_ncsreg.nii.gz').get_data()
+	MGH_groupFC_TMTB_Clust2_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_TMTB_Clust2_ncsreg.nii.gz').get_data()
+
+	# create cluster FC average for each task
+	groupFC_BNT = (MGH_groupFC_BNT_GM_Clust1_ncsreg + MGH_groupFC_BNT_GM_Clust2_ncsreg + MGH_groupFC_BNT_GM_Clust3_ncsreg + MGH_groupFC_BNT_GM_Clust4_ncsreg) / 4
+	groupFC_COM_FIG_RECALL = (MGH_groupFC_COM_FIG_RECALL_Clust1_ncsreg + MGH_groupFC_COM_FIG_RECALL_Clust2_ncsreg + MGH_groupFC_COM_FIG_RECALL_Clust3_ncsreg + MGH_groupFC_COM_FIG_RECALL_Clust4_ncsreg) / 4
+	groupFC_COWA = (MGH_groupFC_COWA_Clust1_ncsreg + MGH_groupFC_COWA_Clust2_ncsreg ) / 2
+	groupFC_TMTB = (MGH_groupFC_TMTB_Clust1_ncsreg + MGH_groupFC_TMTB_Clust2_ncsreg ) / 2
+
+	h = MGH_groupFC_BNT_GM_Clust1_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_BNT_GM_Clust1_ncsreg.nii.gz')
+	groupFC_BNT_nii = nilearn.image.new_img_like(h, groupFC_BNT)
+	groupFC_COM_FIG_RECALL_nii = nilearn.image.new_img_like(h, groupFC_COM_FIG_RECALL)
+	groupFC_COWA_nii = nilearn.image.new_img_like(h, groupFC_COWA)
+	groupFC_TMTB_nii = nilearn.image.new_img_like(h, groupFC_TMTB)
+
+	#mask thalamus FC
+	thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+	thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
+	thalamus_mask_data = thalamus_mask_data>0
+	thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
+
+	names = ['BNT_FC.nii.gz', 'COM_FIG_RECALL_FC.nii.gz', 'COWA_FC.nii.gz', 'TMTB_FC.nii.gz']
+	new_nii=[]
+	for i, nii in enumerate([groupFC_BNT_nii, groupFC_COM_FIG_RECALL_nii, groupFC_COWA_nii,  groupFC_TMTB_nii]):
+		vox_vals = masking.apply_mask(nii, thalamus_mask)[1][0]
+		vox_vals[vox_vals<4] = 0 #np.percentile(vox_vals,90)
+		new_nii.append(masking.unmask(vox_vals, thalamus_mask))
+		new_nii[i].to_filename(names[i])
+		#plotting.plot_stat_map(new_nii[i], bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = True, black_bg=False, cmap='bwr')
+		#plotting.show()
+
+		#find overlaps
+		if i == 0:
+			overlapping_voxels = np.zeros(vox_vals.shape)
+			vox_vals[vox_vals>0] = 1
+		else:
+			vox_vals[vox_vals>0] = 1
+			overlapping_voxels = overlapping_voxels + vox_vals
+
+	LESSY_FC_Overlap = masking.unmask(overlapping_voxels, thalamus_mask)
+	LESSY_FC_Overlap.to_filename('LESSY_FC_Overlap.nii.gz')
+	#plotting.plot_stat_map(LESSY_FC_Overlap, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = True, black_bg=False, cmap='bwr')
+	#plotting.show()
+
 
 	########### fit lme models
 	fcdf = pd.read_csv('~/RDSS/tmp/fcdata.csv')
@@ -1028,76 +1203,6 @@ if __name__ == "__main__":
 		df.to_csv('~/RDSS/tmp/data_z.csv')
 
 	#### calculate PC subject by subject, so we can fit a linear mixed effect model
-	def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
-		''' function to do partial correlation bewteen subcortical and cortical ROI timeseries.
-		Cortical signals (not subcortical) will be removed from subcortical and cortical ROIs,
-		and then pairwise correlation will be calculated bewteen subcortical and cortical ROIs
-		(but not between subcortico-subcortical or cortico-cortical ROIs).
-		This partial correlation/regression approach is for cleaning subcortico-cortical
-		conectivity, which seems to be heavily influenced by a global noise.
-		usage: pcorr_mat = pcorr_subcortico-cortical(subcortical_ts, cortical_ts)
-		----
-		Parameters
-		----
-		subcortical_ts: txt file of timeseries data from subcortical ROIs/voxels, each row is an ROI
-		cortical_ts: txt file of timeseries data from cortical ROIs, each row is an ROI
-		pcorr_mat: output partial correlation matrix
-		'''
-		from scipy import stats, linalg
-		from sklearn.decomposition import PCA
-
-		# # transpose so that column is ROI, this is because output from 3dNetcorr is row-based.
-		# subcortical_ts = subcortical_ts.T
-		# cortical_ts = cortical_ts.T
-		cortical_ts[np.isnan(cortical_ts)]=0
-		subcortical_ts[np.isnan(subcortical_ts)]=0
-
-		# check length of data
-		assert cortical_ts.shape[0] == subcortical_ts.shape[0]
-		num_vol = cortical_ts.shape[0]
-
-		#first check that the dimension is appropriate
-		num_cort = cortical_ts.shape[1]
-		num_subcor = subcortical_ts.shape[1]
-		num_total = num_cort + num_subcor
-
-		#maximum number of regressors that we can use
-		max_num_components = int(num_vol/20)
-		if max_num_components > num_cort:
-			max_num_components = num_cort-1
-
-		pcorr_mat = np.zeros((num_total, num_total), dtype=np.float)
-
-		for j in range(num_cort):
-			k = np.ones(num_cort, dtype=np.bool)
-			k[j] = False
-
-			#use PCA to reduce cortical data dimensionality
-			pca = PCA(n_components=max_num_components)
-			pca.fit(cortical_ts[:,k])
-			reduced_cortical_ts = pca.fit_transform(cortical_ts[:,k])
-
-			#print("Amount of varaince explanined after PCA: %s" %np.sum(pca.explained_variance_ratio_))
-
-			# fit cortical signal to cortical ROI TS, get betas
-			beta_cortical = linalg.lstsq(reduced_cortical_ts, cortical_ts[:,j])[0]
-
-			#get residuals
-			res_cortical = cortical_ts[:, j] - reduced_cortical_ts.dot(beta_cortical)
-
-			for i in range(num_subcor):
-				# fit cortical signal to subcortical ROI TS, get betas
-				beta_subcortical = linalg.lstsq(reduced_cortical_ts, subcortical_ts[:,i])[0]
-
-				#get residuals
-				res_subcortical = subcortical_ts[:, i] - reduced_cortical_ts.dot(beta_subcortical)
-
-				#partial correlation
-				pcorr_mat[i+num_cort, j] = stats.pearsonr(res_cortical, res_subcortical)[0]
-				pcorr_mat[j,i+num_cort ] = pcorr_mat[i+num_cort, j]
-
-		return pcorr_mat
-
 
 	def cal_indiv_rsPC():
 		# calculate PC subject by subject
@@ -1134,7 +1239,7 @@ if __name__ == "__main__":
 			thalamocortical_fc = pmat[400:, 0:400]
 
 			#calculate PC with the extracted thalamocortical FC matrix
-			thalamocortical_fc[thalamocortical_fc<0] = 0
+			thalamocortical_fc[thalamocortical_fc<np.percentile(thalamocortical_fc, 90)] = 0
 			fc_sum = np.sum(thalamocortical_fc, axis=1)
 			kis = np.zeros(np.shape(fc_sum))
 			for ci in np.unique(Schaeffer_CI):
@@ -1189,7 +1294,7 @@ if __name__ == "__main__":
 
 	def write_indiv_subj_PC():
 		#load PC vectors and tha mask to put voxel values back to nii object
-		pc_vectors = np.load('pc_vectors.npy') #resting state FC's PC. dimension 236 (sub) by 2xxx (tha voxel)
+		pc_vectors = np.load('pc_vectors_pcorr.npy') #resting state FC's PC. dimension 236 (sub) by 2xxx (tha voxel)
 		fc_pc = np.load('fc_pc.npy') #LESYMAP FC's PC. dimension 236 (sub) by 2xxx (tha voxel)
 		thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
 		thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
@@ -1224,7 +1329,7 @@ if __name__ == "__main__":
 				pcdf.loc[i, 'MM_impaired'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]>2
 				i = i+1
 
-		pcdf =pcdf.dropna()
+		pcdf = pcdf.dropna()
 		pcdf['MM_impaired'] = pcdf['MM_impaired_num'] >=2
 		pcdf['MM_impaired'] = pcdf['MM_impaired'].astype('int')
 		pcdf.to_csv('~/RDSS/tmp/pcdf.csv')
@@ -1237,122 +1342,140 @@ if __name__ == "__main__":
 	md = smf.mixedlm("LESYMAP_PC ~ MM_impaired_num", pcdf, groups=pcdf['Subject']).fit()
 	print(md.summary())
 
-	md = smf.mixedlm("PC ~ MM_impaired", pcdf, groups=pcdf['Subject']).fit()
+	md = smf.mixedlm("MM_impaired ~ PC", pcdf, groups=pcdf['Subject']).fit()
 	print(md.summary())
 
-	md = smf.mixedlm("PC ~ MM_impaired_num", pcdf, groups=pcdf['Subject']).fit()
+	md = smf.mixedlm("MM_impaired_num ~ PC", pcdf, groups=pcdf['Subject']).fit()
 	print(md.summary())
 
-# from nilearn import plotting
-# pc_image = masking.unmask(pc, thalamus_mask)
-# plotting.plot_glass_brain(pc_image, threshold=0.01)
-# plotting.show()
-#
-# plotting.plot_glass_brain(nib.load(fn), threshold=0.01)
-# plotting.show()
+	pc_image = masking.unmask(np.nanmean(pc_vectors, axis=1), thalamus_mask)
+	plotting.plot_stat_map(pc_image, display_mode='z', cut_coords=12, colorbar = True, black_bg=False, cmap='ocean_hot')
+	plotting.show()
+	#
+	# plotting.plot_glass_brain(nib.load(fn), threshold=0.01)
+	# plotting.show()
 
-#### Check if lesymap FC's participation coef correlate with resting-state network's PC
-print(np.corrcoef(np.nanmean(pc_vectors, axis=1),np.nanmean(fc_pc, axis=1)))
+	#### Check if lesymap FC's participation coef correlate with resting-state network's PC
+	#print(np.corrcoef(np.nanmean(pc_vectors, axis=1),np.nanmean(fc_pc, axis=1)))
 
+
+	####################################################
+	# Compare the voxel-wise PC values between patients with and witout MM impairment
+	PC_map = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/FC_analysis/PC.nii.gz')
+	thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+	thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_data()
+	thalamus_mask_data = thalamus_mask_data>0
+	thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
+
+	vox_PC_df = pd.DataFrame()
+
+	i=0
+	for p in df.loc[df['Site'] == 'Th']['Sub']:
+		try:
+			fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+			m = nib.load(fn)
+		except:
+			continue
+
+		pcs = masking.apply_mask(PC_map, m)
+		pcs = pcs[pcs>0]
+
+		for ix in np.arange(0, pcs.size):
+			vox_PC_df.loc[i, 'PC'] = pcs[ix]
+			vox_PC_df.loc[i, 'Patient'] = p
+			vox_PC_df.loc[i, 'MM_impaired_num'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]
+			vox_PC_df.loc[i, 'MM_impaired'] = int(df.loc[df['Sub'] == p]['MM_impaired'].values[0]>2)
+			i = i+1
+
+	# md = smf.ols("PC ~ MM_impaired_num", vox_PC_df).fit()
+	# print(md.summary())
 
 ########################################################################
 # White matter tracktography
 ########################################################################
 
-WM_densities = ['BNT', 'COM_FIG_RECALL', 'CONS_CFT', 'COWA', 'TMTB']
+	def cal_WM_density():
+		WM_densities = ['BNT', 'COM_FIG_RECALL', 'CONS_CFT', 'COWA', 'TMTB']
 
-for i, p in enumerate(df.loc[df['Site'] == 'Th']['Sub']):
+		for i, p in enumerate(df.loc[df['Site'] == 'Th']['Sub']):
 
-	#WM density is in 1mm gtid, so resample lesion mask
-	#cmd = "3dresample -master /home/kahwang/LESYMAP_for_Kai/BNT_WMTrack.nii.gz -inset /home/kahwang/0.5mm/%s.nii.gz -prefix /home/kahwang/0.5mm/%s_1mm.nii.gz" %(p, p)
-	#os.system(cmd)
+			#WM density is in 1mm gtid, so resample lesion mask
+			#cmd = "3dresample -master /home/kahwang/LESYMAP_for_Kai/BNT_WMTrack.nii.gz -inset /home/kahwang/0.5mm/%s.nii.gz -prefix /home/kahwang/0.5mm/%s_1mm.nii.gz" %(p, p)
+			#os.system(cmd)
 
-	try:
-		fn = '/home/kahwang/0.5mm/%s_1mm.nii.gz' %p
-		m = nib.load(fn).get_data()
+			try:
+				fn = '/home/kahwang/0.5mm/%s_1mm.nii.gz' %p
+				m = nib.load(fn).get_data()
 
-	except:
-		continue
+			except:
+				continue
 
-	for wm in WM_densities:
-		fn = '/home/kahwang/LESYMAP_for_Kai/%s_WMTrack.nii.gz' %wm
-		wm_density = nib.load(fn).get_data()
-		if any(wm_density[np.where(m>0)]):
-			df.loc[i, wm + '_WMtrack'] = 1.0
-		else:
-			df.loc[i, wm + '_WMtrack'] = 0.0
+			for wm in WM_densities:
+				fn = '/home/kahwang/LESYMAP_for_Kai/%s_WMTrack.nii.gz' %wm
+				wm_density = nib.load(fn).get_data()
+				if any(wm_density[np.where(m>0)]):
+					df.loc[i, wm + '_WMtrack'] = 1.0
+				else:
+					df.loc[i, wm + '_WMtrack'] = 0.0
 
-		df[wm + '_WMtrack'] = df[wm + '_WMtrack'].astype('float')
+				df[wm + '_WMtrack'] = df[wm + '_WMtrack'].astype('float')
 
-df.to_csv('~/RDSS/tmp/data_z.csv')
+		df.to_csv('~/RDSS/tmp/data_z.csv')
 
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_WMtrack']>0)]['BNT_z'].values, df.loc[(df['Site']=='Th') & (df['BNT_WMtrack']==0)]['BNT_z'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COM_FIG_RECALL_WMtrack']>0)]['Complex_Figure_Recall_z'].values, df.loc[(df['Site']=='Th') & (df['COM_FIG_RECALL_WMtrack']==0)]['Complex_Figure_Recall_z'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']>0)]['Complex_Figure_Copy_z'].values, df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']==0)]['Complex_Figure_Copy_z'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']>0)]['COWA_z'].values, df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']==0)]['COWA_z'].values)
-scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']>0)]['TMTB_z'].values, df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']==0)]['TMTB_z'].values)
-
-
-### patients with MM impairments (>3):
-# 2105 2552 2092 ca085 ca093 ca104 ca105
-# 2105: TMTB, COWA, RVLT recall,
-# 2552: TMTB, BNT, COWA, RVLT recall
-# 2092: TMTB, COWA, RVLT recall, RVLT recog, RVLT, learn.
-# ca085: BNT, RVLT recall, Com Figure Copy, Fig COM_FIG_RECALL
-# CA093, BNT, RVLT recog, RVLT learn, com fig copy, com fig COM_FIG_RECAL
-# ca104, TMTB, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recall
-# ca105, TMTB, COWA, RVLT recall, RVLT recog, RVLT learn, com fig copy, com fig recal
-
-
-################################
-# compare voxel distribution of lesymap FC weights for different tasks, for each lesion mask
-################################
-# seems like the best way is to first calculation the ratio of FC / total FC weight, and plot the voxel wise ditribution of this ratio. You would expect most be around .5 (for 2 tasks) or .3 (for 3 tasks)
-lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
-
-lesymap_clusters_p={}
-lesymap_clusters_p['2105'] = ['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
-
-vwdf = pd.DataFrame()
-
-for p in ['2105']:
-	try:
-		fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
-		m = nib.load(fn).get_data()
-	except:
-		continue
-
-
-	fcsum=0
-	for lesymap in lesymap_clusters_p[p]:
-		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
-		fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
-		fcmap[fcmap<0] = 0
-		fcsum = fcsum+abs(fcmap)
-
-	tempdf=	pd.DataFrame()
-	for lesymap in lesymap_clusters_p[p]:
-		ttdf = pd.DataFrame()
-		fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
-		fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
-		fcmap[fcmap<0] = 0
-		ttdf['weight'] = abs(fcmap)/fcsum
-		ttdf['task'] = lesymap
-		ttdf['subject'] = p
-
-		tempdf = pd.concat([ttdf,tempdf])
-	vwdf = pd.concat([tempdf,vwdf])
-
-sdf = vwdf.loc[vwdf['subject']=='2105']
-sdf = sdf.loc[sdf['task'].isin(['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2'])]
-sns.histplot(data=sdf, x="weight", hue="task", stat="probability", kde=True)
-plt.show()
+	# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['BNT_WMtrack']>0)]['BNT_z'].values, df.loc[(df['Site']=='Th') & (df['BNT_WMtrack']==0)]['BNT_z'].values)
+	# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COM_FIG_RECALL_WMtrack']>0)]['Complex_Figure_Recall_z'].values, df.loc[(df['Site']=='Th') & (df['COM_FIG_RECALL_WMtrack']==0)]['Complex_Figure_Recall_z'].values)
+	# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']>0)]['Complex_Figure_Copy_z'].values, df.loc[(df['Site']=='Th') & (df['CONS_CFT_WMtrack']==0)]['Complex_Figure_Copy_z'].values)
+	# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']>0)]['COWA_z'].values, df.loc[(df['Site']=='Th') & (df['COWA_WMtrack']==0)]['COWA_z'].values)
+	# scipy.stats.mannwhitneyu(df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']>0)]['TMTB_z'].values, df.loc[(df['Site']=='Th') & (df['TMTB_WMtrack']==0)]['TMTB_z'].values)
 
 
 
 
+	################################
+	# compare voxel distribution of lesymap FC weights for different tasks, for each lesion mask
+	################################
+
+	def plot_voxel_FC_dist():
+		# seems like the best way is to first calculation the ratio of FC / total FC weight, and plot the voxel wise ditribution of this ratio. You would expect most be around .5 (for 2 tasks) or .3 (for 3 tasks)
+		lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+
+		lesymap_clusters_p={}
+		lesymap_clusters_p['2105'] = ['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+
+		vwdf = pd.DataFrame()
+
+		for p in ['2105']:
+			try:
+				fn = '/home/kahwang/0.5mm/%s_2mm.nii.gz' %p
+				m = nib.load(fn).get_data()
+			except:
+				continue
 
 
+			fcsum=0
+			for lesymap in lesymap_clusters_p[p]:
+				fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+				fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
+				fcmap[fcmap<0] = 0
+				fcsum = fcsum+abs(fcmap)
+
+			tempdf=	pd.DataFrame()
+			for lesymap in lesymap_clusters_p[p]:
+				ttdf = pd.DataFrame()
+				fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+				fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
+				fcmap[fcmap<0] = 0
+				ttdf['weight'] = abs(fcmap)/fcsum
+				ttdf['task'] = lesymap
+				ttdf['subject'] = p
+
+				tempdf = pd.concat([ttdf,tempdf])
+			vwdf = pd.concat([tempdf,vwdf])
+
+		sdf = vwdf.loc[vwdf['subject']=='2105']
+		sdf = sdf.loc[sdf['task'].isin(['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2'])]
+		sns.histplot(data=sdf, x="weight", hue="task", stat="probability", kde=True)
+		plt.show()
 
 
 
