@@ -1010,6 +1010,7 @@ if __name__ == "__main__":
 	BNT_LESYMAP_GM_nii = nilearn.image.new_img_like(m, BNT_LESYMAP_map, copy_header=True)
 	COWA_LESYMAP_GM_nii = nilearn.image.new_img_like(m, COWA_LESYMAP_map, copy_header=True)
 	COM_FIG_RECALL_LESYMAP_GM_nii = nilearn.image.new_img_like(m, COM_FIG_RECALL_LESYMAP_map, copy_header=True)
+	TMTB_LESYMAP_GM_nii.to_filename('/home/kahwang/LESYMAP_for_Kai/TMTB_GM.nii.gz')
 
 	mni_template = nib.load('/data/backed_up/shared/standard/mni_icbm152_nlin_asym_09c/mni_icbm152_t1_tal_nlin_asym_09c_brain.nii')
 
@@ -1034,10 +1035,12 @@ if __name__ == "__main__":
 
 
 	#############################################
-	### run Map_Network.sh, this one use thalamus lesion mask at seed and check overlap with cortical LESYMAP masks
+	### Need to run Prep_LESYMAP_clusters.sh first
 	### Use linear mixed effect regression model to test FC differences
 
+	# this will generate the fcdf
 	#run_LESYMAP_fc()
+
 
 	########### plot lessyamp_FC in thalamus
 	MGH_groupFC_BNT_GM_Clust1_ncsreg = nib.load('/data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_BNT_GM_Clust1_ncsreg.nii.gz').get_data()
@@ -1075,11 +1078,11 @@ if __name__ == "__main__":
 	new_nii=[]
 	for i, nii in enumerate([groupFC_BNT_nii, groupFC_COM_FIG_RECALL_nii, groupFC_COWA_nii,  groupFC_TMTB_nii]):
 		vox_vals = masking.apply_mask(nii, thalamus_mask)[1][0]
-		vox_vals[vox_vals<4] = 0 #np.percentile(vox_vals,90)
+		vox_vals[vox_vals<4.13] = 0 #np.percentile(vox_vals,90) #threshold at t =4.13, which is p=1-e5
 		new_nii.append(masking.unmask(vox_vals, thalamus_mask))
 		new_nii[i].to_filename(names[i])
-		#plotting.plot_stat_map(new_nii[i], bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = True, black_bg=False, cmap='bwr')
-		#plotting.show()
+		plotting.plot_stat_map(new_nii[i], bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = True, black_bg=False, cmap='bwr')
+		plotting.show()
 
 		#find overlaps
 		if i == 0:
@@ -1091,11 +1094,12 @@ if __name__ == "__main__":
 
 	LESSY_FC_Overlap = masking.unmask(overlapping_voxels, thalamus_mask)
 	LESSY_FC_Overlap.to_filename('LESSY_FC_Overlap.nii.gz')
-	#plotting.plot_stat_map(LESSY_FC_Overlap, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = True, black_bg=False, cmap='bwr')
-	#plotting.show()
+	plotting.plot_stat_map(LESSY_FC_Overlap, bg_img = mni_template, display_mode='z', cut_coords=4, colorbar = True, black_bg=False, cmap='bwr')
+	plotting.show()
 
 
 	########### fit lme models
+	# remember to run run_LESYMAP_fc()
 	fcdf = pd.read_csv('~/RDSS/tmp/fcdata.csv')
 
 	# statsmodel, subject with random intercept, random slope for each subj
@@ -1348,12 +1352,10 @@ if __name__ == "__main__":
 	md = smf.mixedlm("MM_impaired_num ~ PC", pcdf, groups=pcdf['Subject']).fit()
 	print(md.summary())
 
-	pc_image = masking.unmask(np.nanmean(pc_vectors, axis=1), thalamus_mask)
-	plotting.plot_stat_map(pc_image, display_mode='z', cut_coords=12, colorbar = True, black_bg=False, cmap='ocean_hot')
-	plotting.show()
-	#
-	# plotting.plot_glass_brain(nib.load(fn), threshold=0.01)
-	# plotting.show()
+	pc_image = masking.unmask(np.nanmean(fc_pc, axis=1), thalamus_mask)
+	#plotting.plot_stat_map(pc_image, display_mode='z', cut_coords=12, colorbar = True, black_bg=False, cmap='ocean_hot')
+	#plotting.show()
+
 
 	#### Check if lesymap FC's participation coef correlate with resting-state network's PC
 	#print(np.corrcoef(np.nanmean(pc_vectors, axis=1),np.nanmean(fc_pc, axis=1)))
@@ -1434,14 +1436,22 @@ if __name__ == "__main__":
 	################################
 	# compare voxel distribution of lesymap FC weights for different tasks, for each lesion mask
 	################################
+	#use these nii objects to calcuate FC weights for each task
+	#groupFC_BNT_nii
+	#groupFC_COM_FIG_RECALL_nii
+	#groupFC_COWA_nii
+	#groupFC_TMTB_nii
+
+	#Patients lesion disruption
 
 	def plot_voxel_FC_dist():
 		# seems like the best way is to first calculation the ratio of FC / total FC weight, and plot the voxel wise ditribution of this ratio. You would expect most be around .5 (for 2 tasks) or .3 (for 3 tasks)
 		lesymap_clusters = ['BNT_GM_Clust1', 'BNT_GM_Clust2', 'BNT_GM_Clust3', 'BNT_GM_Clust4', 'COM_FIG_RECALL_Clust1', 'COM_FIG_RECALL_Clust2', 'COM_FIG_RECALL_Clust3', 'COM_FIG_RECALL_Clust4', 'COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
 
 		lesymap_clusters_p={}
-		lesymap_clusters_p['2105'] = ['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
-
+		lesymap_clusters_p['2105'] = [groupFC_COWA_nii, groupFC_TMTB_nii]#['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2']
+		tasks={}
+		tasks['2105'] = ['COWA', 'TMTB']
 		vwdf = pd.DataFrame()
 
 		for p in ['2105']:
@@ -1454,27 +1464,27 @@ if __name__ == "__main__":
 
 			fcsum=0
 			for lesymap in lesymap_clusters_p[p]:
-				fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
-				fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
+				#fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+				fcmap = lesymap.get_data()[:,:,:,0,0][m>0]
 				fcmap[fcmap<0] = 0
 				fcsum = fcsum+abs(fcmap)
 
 			tempdf=	pd.DataFrame()
-			for lesymap in lesymap_clusters_p[p]:
+			for i, lesymap in enumerate(lesymap_clusters_p[p]):
 				ttdf = pd.DataFrame()
-				fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
-				fcmap = nib.load(fcfile).get_data()[:,:,:,0,0][m>0]
+				#fcfile = '/home/kahwang/bsh/Tha_Lesion_Mapping/MGH_groupFC_%s_ncsreg.nii.gz'  %lesymap
+				fcmap = lesymap.get_data()[:,:,:,0,0][m>0]
 				fcmap[fcmap<0] = 0
 				ttdf['weight'] = abs(fcmap)/fcsum
-				ttdf['task'] = lesymap
+				ttdf['task'] = tasks[p][i]
 				ttdf['subject'] = p
 
 				tempdf = pd.concat([ttdf,tempdf])
 			vwdf = pd.concat([tempdf,vwdf])
 
 		sdf = vwdf.loc[vwdf['subject']=='2105']
-		sdf = sdf.loc[sdf['task'].isin(['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2'])]
-		sns.histplot(data=sdf, x="weight", hue="task", stat="probability", kde=True)
+		#sdf = sdf.loc[sdf['task'].isin(['COWA_Clust1', 'COWA_Clust2', 'TMTB_Clust1', 'TMTB_Clust2'])]
+		sns.kdeplot(data=sdf, x="weight", hue="task")
 		plt.show()
 
 

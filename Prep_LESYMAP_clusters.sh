@@ -61,8 +61,9 @@
 for subject in $(cat /data/backed_up/shared/Tha_Lesion_Mapping/Subject_List.txt); do
 
   # cortical lesion masks
-	for mask in BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECALL_Clust1 COM_FIG_RECALL_Clust2 COM_FIG_RECALL_Clust3 COM_FIG_RECALL_Clust4 COWA_Clust1 COWA_Clust2 TMTB_Clust1 TMTB_Clust2; do
-
+	for mask in TMTB_Clust1 TMTB_Clust2; do
+	 #BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECALL_Clust1 COM_FIG_RECALL_Clust2 COM_FIG_RECALL_Clust3 COM_FIG_RECALL_Clust4 COWA_Clust1 COWA_Clust2 TMTB_Clust1 TMTB_Clust2
+	  rm -rf /data/backed_up/shared/Tha_Lesion_Mapping/${subject}/seed_corr_${mask}_ncsreg*
 		3dNetCorr -inset /data/backed_up/shared/NKI/${subject}/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz \
 		-in_rois /home/kahwang/LESYMAP_for_Kai/${mask}.nii.gz \
 		-nifti \
@@ -74,7 +75,7 @@ done
 
 
 # group stats on lesion network
-for mask in BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECALL_Clust1 COM_FIG_RECALL_Clust2 COM_FIG_RECALL_Clust3 COM_FIG_RECALL_Clust4 COWA_Clust1 COWA_Clust2 TMTB_Clust1 TMTB_Clust2; do
+for mask in TMTB_Clust1 TMTB_Clust2; do
 
   rm /data/backed_up/shared/Tha_Lesion_Mapping/NKI_groupFC_${mask}_ncsreg.nii.gz
 
@@ -90,8 +91,8 @@ for subject in $(cat /data/backed_up/shared/Tha_Lesion_Mapping/MGH_List_Bridged.
 
 	3dTcat -prefix /data/backed_up/shared/MGH/MGH/${subject}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz /data/backed_up/shared/MGH/MGH/${subject}/MNINonLinear/rfMRI_REST1_ncsreg.nii.gz /data/backed_up/shared/MGH/MGH/${subject}/MNINonLinear/rfMRI_REST2_ncsreg.nii.gz
 
-	for mask in BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECALL_Clust1 COM_FIG_RECALL_Clust2 COM_FIG_RECALL_Clust3 COM_FIG_RECALL_Clust4 COWA_Clust1 COWA_Clust2 TMTB_Clust1 TMTB_Clust2; do
-
+	for mask in TMTB_Clust1 TMTB_Clust2; do
+		rm -rf /data/backed_up/shared/Tha_Lesion_Mapping/MGH_${subject}/seed_corr_${mask}_ncsreg*
 		3dNetCorr -inset /data/backed_up/shared/MGH/MGH/${subject}/MNINonLinear/rfMRI_REST_ncsreg.nii.gz \
 		-in_rois /home/kahwang/LESYMAP_for_Kai/${mask}.nii.gz \
 		-nifti \
@@ -103,7 +104,7 @@ done
 
 
 #### group stats on lesion network
-for mask in BNT_GM_Clust1 BNT_GM_Clust2 BNT_GM_Clust3 BNT_GM_Clust4 COM_FIG_RECALL_Clust1 COM_FIG_RECALL_Clust2 COM_FIG_RECALL_Clust3 COM_FIG_RECALL_Clust4 COWA_Clust1 COWA_Clust2 TMTB_Clust1 TMTB_Clust2; do
+for mask in TMTB_Clust1 TMTB_Clust2; do
 
   rm /data/backed_up/shared/Tha_Lesion_Mapping/MGH_groupFC_${mask}_ncsreg.nii.gz
 
