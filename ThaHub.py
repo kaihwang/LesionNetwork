@@ -768,7 +768,7 @@ if __name__ == "__main__":
 	#load_and_normalize_neuropsych_data()
 	#Cal_lesion_size()
 	#determine_comparison_patients()
-	#neuropsych_zscore()
+	neuropsych_zscore(-1.5)
 
 	###################
 	# compare test scores
@@ -779,6 +779,7 @@ if __name__ == "__main__":
 	# visual-motor, Construction
 	print('TMTA')
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values))
+	print('Complex_Figure_Copy_Comparison')
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
 
 	# executive function
@@ -822,6 +823,31 @@ if __name__ == "__main__":
 	#plotting.plot_stat_map(lesion_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=5, colorbar = False, black_bg=False, cmap='gist_ncar')
 	#plotting.show()
 
+
+	################################
+	# Figure SX.  Correlation among scores
+	################################
+	def plot_corr_table():
+		corrdf = pd.read_csv('~/RDSS/tmp/crosscorr.csv')
+		corrdf = corrdf.set_index('Tasks')
+		corrplot = sns.heatmap(corrdf, vmin = -1, vmax=1, center=0, cmap="coolwarm")
+		corrplot.set_xticklabels(['Lesion Size', 'TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
+		'RAVLT Recall', 'RAVLT Recognition',  'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
+		'Complex Figure Copy', 'Comeplex Figure Recall'], rotation=90)
+		corrplot.set_yticklabels(['Lesion Size', 'TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
+		'RAVLT Recall', 'RAVLT Recognition',  'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
+		'Complex Figure Copy', 'Comeplex Figure Recall'])
+		plt.xlabel('')
+		plt.ylabel('')
+		plt.tight_layout()
+		#plt.show()
+		#plotting.show()
+		fn = '/home/kahwang/RDSS/tmp/corrtable.pdf'
+		plt.savefig(fn)
+
+
+
+
 	################################
 	# Figure 2.  Plot table of z scores to show mutlimodal impairment
 	################################
@@ -855,7 +881,7 @@ if __name__ == "__main__":
 		smlesion_overlap_nii.to_filename('images/smlesion_overlap.nii.gz')
 
 
-	def map_lesion_unique_masks(show_plot = False):
+	def map_lesion_unique_masks(df):
 		''' map each neuropsych's unique lesion mask'''
 
 		thalamus_mask_data = nib.load('/home/kahwang/0.5mm/tha_0.5_mask.nii.gz').get_fdata()
@@ -907,9 +933,9 @@ if __name__ == "__main__":
 			fn = 'images/' + neuropsych + '_lesionmask_pcount.nii.gz'
 			impairment_overlap_nii.to_filename(fn)
 
-			if show_plot:
-				plotting.plot_stat_map(impairment_overlap_nii, title = list_of_neuropsych_var[j], cmap='black_purple', vmax = 3, cut_coords =[7,11], display_mode = 'z')
-				plotting.show()
+			#if show_plot:
+			#	plotting.plot_stat_map(impairment_overlap_nii, title = list_of_neuropsych_var[j], cmap='black_purple', vmax = 3, cut_coords =[7,11], display_mode = 'z')
+			#	plotting.show()
 
 			mask_niis[list_of_neuropsych_var[j]] = impairment_overlap_nii
 
@@ -918,15 +944,18 @@ if __name__ == "__main__":
 
 
 		VM_mask = np.max([mask_niis['TMT part A'].get_fdata(), mask_niis['Complex Figure Construction'].get_fdata()], axis=0)
+		CF_mask = mask_niis['Complex Figure Construction'].get_fdata()
 		RAVLT_mask = np.max([mask_niis['RAVLT Trial 1'].get_fdata(),
 			mask_niis['RAVLT Trial 2'].get_fdata(),
 			mask_niis['RAVLT Trial 3'].get_fdata(),
 			mask_niis['RAVLT Trial 4'].get_fdata(),
-			mask_niis['RAVLT Trial 5'].get_fdata()], axis=0)
+			mask_niis['RAVLT Trial 5'].get_fdata(),
+			mask_niis['RAVLT Recall'].get_fdata(), mask_niis['RAVLT Recognition'].get_fdata()], axis=0)
 
 		Verbal_mask = np.max([mask_niis['Boston Naming'].get_fdata(), mask_niis['COWA'].get_fdata()], axis=0)
 		Memory_mask = np.max([mask_niis['RAVLT Recall'].get_fdata(), mask_niis['RAVLT Recognition'].get_fdata()], axis=0)
 		TMTB_mask = mask_niis['TMT part B'].get_fdata()
+		TMTA_mask = mask_niis['TMT part A'].get_fdata()
 
 		RAVLT_mask = nilearn.image.new_img_like(h, RAVLT_mask)
 		RAVLT_mask.to_filename('images/RAVLT_overlap.nii.gz')
@@ -938,42 +967,51 @@ if __name__ == "__main__":
 		Memory_mask.to_filename('images/Memory_overlap.nii.gz')
 		TMTB_mask = nilearn.image.new_img_like(h, TMTB_mask)
 		TMTB_mask.to_filename('images/TMTB_overlap.nii.gz')
+		TMTA_mask = nilearn.image.new_img_like(h, TMTA_mask)
+		TMTA_mask.to_filename('images/CF_overlap.nii.gz')
+		CF_mask = nilearn.image.new_img_like(h, CF_mask)
+		CF_mask.to_filename('images/CF_overlap.nii.gz')
 
 		# count number of task lesion mask overlap
-		Num_task_mask = 1.0*(RAVLT_mask.get_fdata()>0) + 1.0*(Verbal_mask.get_fdata()>0) + 1.0*(VM_mask.get_fdata()>0) + 1.0*(TMTB_mask.get_fdata()>0) + 1.0*(Memory_mask.get_fdata()>0)
+		Num_task_mask = 1.0*(RAVLT_mask.get_fdata()>0) + 1.0*(Verbal_mask.get_fdata()>0) + 1.0*(CF_mask.get_fdata()>0) + 1.0*(TMTB_mask.get_fdata()>0) + 1.0*(TMTA_mask.get_fdata()>0)
 		Num_task_mask = nilearn.image.new_img_like(h, Num_task_mask)
 		Num_task_mask.to_filename('images/Num_of_task_impaired_overlap.nii.gz')
-		#map_lesion_unique_masks(show_plot = False)
+
+		return Num_task_mask, TMTB_mask, Memory_mask, VM_mask, Verbal_mask, RAVLT_mask
 
 
+	Num_task_mask, TMTB_mask, Memory_mask, VM_mask, Verbal_mask, RAVLT_mask = map_lesion_unique_masks(df)
 
-	################################
-	# Figure SX.  Correlation among scores
-	################################
-	def plot_corr_table():
-		corrdf = pd.read_csv('~/RDSS/tmp/crosscorr.csv')
-		corrdf = corrdf.set_index('Tasks')
-		corrplot = sns.heatmap(corrdf, vmin = -1, vmax=1, center=0, cmap="coolwarm")
-		corrplot.set_xticklabels(['Lesion Size', 'TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
-		'RAVLT Recall', 'RAVLT Recognition',  'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
-		'Complex Figure Copy', 'Comeplex Figure Recall'], rotation=90)
-		corrplot.set_yticklabels(['Lesion Size', 'TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
-		'RAVLT Recall', 'RAVLT Recognition',  'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
-		'Complex Figure Copy', 'Comeplex Figure Recall'])
-		plt.xlabel('')
-		plt.ylabel('')
-		plt.tight_layout()
-		#plt.show()
-		#plotting.show()
-		fn = '/home/kahwang/RDSS/tmp/corrtable.pdf'
-		plt.savefig(fn)
+
 
 
 	################################
 	# Figure 3  Compare lesion site to PC values
 	################################
 
+	rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
+	from nilearn.image import resample_to_img
+	rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
 
+	PCs={}
+	for t in [5,4,3,2,1]:
+		tmp_mask = nilearn.image.new_img_like(Num_task_mask, Num_task_mask.get_fdata()==t)
+		PCs[t]= masking.apply_mask(rsfc_pc05, tmp_mask)
+		print(np.median(masking.apply_mask(rsfc_pc05, tmp_mask)))
+
+	#i=0
+	pcdf = pd.DataFrame()
+	for t in [5,4,3,2,1]:
+		pdf = pd.DataFrame()
+		pdf['PC'] = PCs[t]
+		pdf['Task#'] = t
+
+		pcdf =pd.concat([pcdf, pdf])
+
+	sns.kdeplot(x='PC', data=pcdf, hue='Task#', common_norm = False)
+	plt.show()
+	#from scipy import stats
+	#stats.ks_2samp(PCs[5], PCs[2])
 
 
 

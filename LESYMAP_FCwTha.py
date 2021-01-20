@@ -577,7 +577,7 @@ if __name__ == "__main__":
 		thalamus_mask_data = thalamus_mask_data>0
 		thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data, copy_header = True)
 		meanlcpc_image = masking.unmask(meanfc_pc, thalamus_mask).get_data()
-		rsfc_pc = nib.load('RSFC_PC.nii.gz').get_data()
+		rsfc_pc = nib.load('RSFC_PC.nii.gz').get_fdata()
 
 		lspcdf = pd.DataFrame()
 		i=0
