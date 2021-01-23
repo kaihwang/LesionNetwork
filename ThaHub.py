@@ -27,7 +27,12 @@ def load_and_normalize_neuropsych_data():
 	# remove acute patietns (chronicity < 3 months)
 	df = df.loc[df['Chronicity']>2].reset_index()
 
+	#calculate several composite scores of RAVLT
+	df['RAVLT_Immediate_Recall'] = df['RAVLT_T1']
+	df['RAVLT_Learning'] =  df['RAVLT_T5'] +  df['RAVLT_T4'] +  df['RAVLT_T3'] +  df['RAVLT_T2'] +  df['RAVLT_T1']- 5* df['RAVLT_T1']
+
 	# Norms for TMT
+	# TMT norm data from Tombaugh, T. N. (2004). Trail Making Test A and B: normative data stratified by age and education. Archives of Clinical Neuropsychology: The Official Journal of the National Academy of Neuropsychologists, 19(2), 203–214.
 	TMTA_norm ={
 	'24': {'mean': 22.93, 'sd': 6.87},
 	'34': {'mean': 24.40, 'sd': 8.71},
@@ -70,8 +75,8 @@ def load_and_normalize_neuropsych_data():
 	'89-': {'mean': 167.69, 'sd': 78.50},
 	}
 
-	# compare neuropsych data
-	#BNT norms:
+	#BNT norms
+	# Norm from: Tombaugh, T. N., & Hubiey, A. M. (1997). The 60-item Boston Naming Test: Norms for cognitively intact adults aged 25 to 88 years. Journal of Clinical and Experimental Neuropsychology, 19(6), 922-932.
 	# 18-39 55.8 (3.8)
 	# 40-49 56.8 (3)
 	# 50-59 55.2 (4)
@@ -103,7 +108,7 @@ def load_and_normalize_neuropsych_data():
 	'F16': {'mean': 46.5 , 'sd': 11.2},
 	}
 
-
+	# RAVLT norms from : Ivnik, R. J., Malec, J. F., Tangalos, E. G., Petersen, R. C., Kokmen, E., & Kurland, L. T. (1990). The Auditory-Verbal Learning Test (AVLT): norms for ages 55 years and older. Psychological Assessment: A Journal of Consulting and Clinical Psychology, 2(3), 304.
 	# RVLT Delay recall
 	#   55-59   10.4 (3.1)
 	#   60-64   9.9 (3.1)
@@ -146,6 +151,17 @@ def load_and_normalize_neuropsych_data():
 
 	#trial 1
 	RAVLT_T1_norm = {
+	'59': {'mean': 6.8, 'sd': 1.6},
+	'64': {'mean': 6.4 , 'sd': 1.9},
+	'69': {'mean': 5.7, 'sd': 1.6},
+	'74': {'mean': 5.5, 'sd': 1.5},
+	'79': {'mean': 5.0 , 'sd': 1.5},
+	'84': {'mean': 4.4 , 'sd': 1.5},
+	'85': {'mean': 4.0 , 'sd': 1.8},
+	}
+
+	#trial 1 is also immediate learning
+	RAVLT_Immediate_Recall_norm = {
 	'59': {'mean': 6.8, 'sd': 1.6},
 	'64': {'mean': 6.4 , 'sd': 1.9},
 	'69': {'mean': 5.7, 'sd': 1.6},
@@ -199,8 +215,20 @@ def load_and_normalize_neuropsych_data():
 	'85': {'mean': 9.1 , 'sd': 2.3},
 	}
 
+	# Learning, which is sum of T1 to T5 minus 5* T1
+	RAVLT_Learning_norm = {
+	'59': {'mean': 19.3, 'sd': 5.8},
+	'64': {'mean': 17.8 , 'sd': 7.0},
+	'69': {'mean': 17.2, 'sd': 6.1},
+	'74': {'mean': 15.6, 'sd': 6.9},
+	'79': {'mean': 14.5 , 'sd': 6.6},
+	'84': {'mean': 14.3 , 'sd': 7.3},
+	'85': {'mean': 14.4 , 'sd': 6.6},
+	}
+
 
 	# rey o complex figure construction
+	# From: Fastenau, P. S., Denburg, N. L., & Hufford, B. J. (1999). Adult norms for the Rey-Osterrieth Complex Figure Test and for supplemental recognition and matching trials from the Extended Complex Figure Test. The Clinical Neuropsychologist, 13(1), 30-47.
 	#   40  32.83 (3.1)
 	#   50  31.79 (4.55)
 	#   60  31.94 (3.37)
@@ -209,13 +237,14 @@ def load_and_normalize_neuropsych_data():
 
 	Complex_Figure_Copy_norm = {
 	'40': {'mean': 32.83, 'sd': 3.1},
-	'50': {'mean': 31.79 , 'sd': 4.55},
-	'60': {'mean': 31.94, 'sd': 3.37},
-	'70': {'mean': 31.76, 'sd': 3.64},
-	'80': {'mean': 30.14 , 'sd': 4.52},
+	'50': {'mean': 31.79 , 'sd': 4.55}, #40 - 55
+	'60': {'mean': 31.62, 'sd': 4.61}, #45-60
+	'70': {'mean': 31.76, 'sd': 3.64},	#60-75
+	'80': {'mean': 30.14 , 'sd': 4.52}, #75-85
 	}
 
-	# rey o complex figure delayed recall
+	# rey o complex figure delayed recall.
+	# Note the recall is 30 minute delay
 	#   40  19.28 (7.29)
 	#   50  17.13 (7.14)
 	#   60  16.55 (6.08)
@@ -223,10 +252,10 @@ def load_and_normalize_neuropsych_data():
 	#   80  13.17 (5.32)
 	Complex_Figure_Recall_norm = {
 	'40': {'mean': 19.28, 'sd': 7.29},
-	'50': {'mean': 17.13 , 'sd': 7.14},
-	'60': {'mean': 16.55, 'sd': 6.08},
-	'70': {'mean': 15.18, 'sd': 5.57},
-	'80': {'mean': 13.17 , 'sd': 5.32},
+	'50': {'mean': 17.13 , 'sd': 7.14}, #40 - 55
+	'60': {'mean': 17.48, 'sd': 7.11},	#45-60
+	'70': {'mean': 15.29, 'sd': 5.57},  #60-75
+	'80': {'mean': 13.17 , 'sd': 5.32}, #75-85
 	}
 
 	# Convert raw scores to norm adjusted z score
@@ -452,29 +481,58 @@ def load_and_normalize_neuropsych_data():
 		elif 84 < df.loc[i, 'Age']:
 			df.loc[i, 'RAVLT_T5_z'] = (df.loc[i, 'RAVLT_T5'] - RAVLT_T5_norm['85']['mean']) / RAVLT_T5_norm['85']['sd']
 
+		if df.loc[i, 'Age'] <= 59:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['59']['mean']) / RAVLT_Learning_norm['59']['sd']
+		elif 59 < df.loc[i, 'Age'] <= 64:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['64']['mean']) / RAVLT_Learning_norm['64']['sd']
+		elif 64 < df.loc[i, 'Age'] <= 69:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['69']['mean']) / RAVLT_Learning_norm['69']['sd']
+		elif 69 < df.loc[i, 'Age'] <= 74:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['74']['mean']) / RAVLT_Learning_norm['74']['sd']
+		elif 74 < df.loc[i, 'Age'] <= 79:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['79']['mean']) / RAVLT_Learning_norm['79']['sd']
+		elif 79 < df.loc[i, 'Age'] <= 84:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['84']['mean']) / RAVLT_Learning_norm['84']['sd']
+		elif 84 < df.loc[i, 'Age']:
+			df.loc[i, 'RAVLT_Learning_z'] = (df.loc[i, 'RAVLT_Learning'] - RAVLT_Learning_norm['85']['mean']) / RAVLT_Learning_norm['85']['sd']
+
+		if df.loc[i, 'Age'] <= 59:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['59']['mean']) / RAVLT_Immediate_Recall_norm['59']['sd']
+		elif 59 < df.loc[i, 'Age'] <= 64:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['64']['mean']) / RAVLT_Immediate_Recall_norm['64']['sd']
+		elif 64 < df.loc[i, 'Age'] <= 69:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['69']['mean']) / RAVLT_Immediate_Recall_norm['69']['sd']
+		elif 69 < df.loc[i, 'Age'] <= 74:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['74']['mean']) / RAVLT_Immediate_Recall_norm['74']['sd']
+		elif 74 < df.loc[i, 'Age'] <= 79:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['79']['mean']) / RAVLT_Immediate_Recall_norm['79']['sd']
+		elif 79 < df.loc[i, 'Age'] <= 84:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['84']['mean']) / RAVLT_Immediate_Recall_norm['84']['sd']
+		elif 84 < df.loc[i, 'Age']:
+			df.loc[i, 'RAVLT_Immediate_Recall_z'] = (df.loc[i, 'RAVLT_Immediate_Recall'] - RAVLT_Immediate_Recall_norm['85']['mean']) / RAVLT_Immediate_Recall_norm['85']['sd']
 
 
 		if df.loc[i, 'Age'] <= 40:
 			df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['40']['mean']) / Complex_Figure_Copy_norm['40']['sd']
-		elif 40 < df.loc[i, 'Age'] <= 50:
+		elif 40 < df.loc[i, 'Age'] <= 55:
 			df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['50']['mean']) / Complex_Figure_Copy_norm['50']['sd']
-		elif 50 < df.loc[i, 'Age'] <= 60:
+		elif 55 < df.loc[i, 'Age'] <= 60:
 			df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['60']['mean']) / Complex_Figure_Copy_norm['60']['sd']
-		elif 60 < df.loc[i, 'Age'] <= 70:
+		elif 60 < df.loc[i, 'Age'] <= 75:
 			df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['70']['mean']) / Complex_Figure_Copy_norm['70']['sd']
-		elif 70 < df.loc[i, 'Age']:
+		elif 75 < df.loc[i, 'Age']:
 			df.loc[i, 'Complex_Figure_Copy_z'] = (df.loc[i, 'Complex_Figure_Copy'] - Complex_Figure_Copy_norm['80']['mean']) / Complex_Figure_Copy_norm['80']['sd']
 
 		if df.loc[i, 'Age'] <= 40:
-			df.loc[i, 'Complex_Figure_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['40']['mean']) / Complex_Figure_Recall_norm['40']['sd']
-		elif 40 < df.loc[i, 'Age'] <= 50:
-			df.loc[i, 'Complex_Figure_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['50']['mean']) / Complex_Figure_Recall_norm['50']['sd']
-		elif 50 < df.loc[i, 'Age'] <= 60:
-			df.loc[i, 'Complex_Figure_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['60']['mean']) / Complex_Figure_Recall_norm['60']['sd']
-		elif 60 < df.loc[i, 'Age'] <= 70:
-			df.loc[i, 'Complex_Figure_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['70']['mean']) / Complex_Figure_Recall_norm['70']['sd']
-		elif 70 < df.loc[i, 'Age']:
-			df.loc[i, 'Complex_Figure_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['80']['mean']) / Complex_Figure_Recall_norm['80']['sd']
+			df.loc[i, 'Complex_Figure_Delayed_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['40']['mean']) / Complex_Figure_Recall_norm['40']['sd']
+		elif 40 < df.loc[i, 'Age'] <= 55:
+			df.loc[i, 'Complex_Figure_Delayed_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['50']['mean']) / Complex_Figure_Recall_norm['50']['sd']
+		elif 55 < df.loc[i, 'Age'] <= 60:
+			df.loc[i, 'Complex_Figure_Delayed_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['60']['mean']) / Complex_Figure_Recall_norm['60']['sd']
+		elif 60 < df.loc[i, 'Age'] <= 75:
+			df.loc[i, 'Complex_Figure_Delayed_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['70']['mean']) / Complex_Figure_Recall_norm['70']['sd']
+		elif 75 < df.loc[i, 'Age']:
+			df.loc[i, 'Complex_Figure_Delayed_Recall_z'] = (df.loc[i, 'Complex_Figure_Recall'] - Complex_Figure_Recall_norm['80']['mean']) / Complex_Figure_Recall_norm['80']['sd']
 
 	df.to_csv('~/RDSS/tmp/data_z.csv')
 
@@ -496,7 +554,7 @@ def Cal_lesion_size():
 		try:
 			fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
 			m = nib.load(fn)
-			df.loc[i, 'Lesion Size'] = np.sum(m.get_data()) * 0.125 #0.5 isotropic voxels, cubic = 0.125
+			df.loc[i, 'Lesion Size'] = np.sum(m.get_fdata()) * 0.125 #0.5 isotropic voxels, cubic = 0.125
 		except:
 			df.loc[i, 'Lesion Size'] = np.nan
 
@@ -511,25 +569,25 @@ def determine_comparison_patients():
 
 	# load Lesymap lesion sympton maps from various tasks
 	TMTB_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/Trail_making_part_B_LESYMAP/stat_img.nii.gz')
-	TMTB_LESYMAP_map = TMTB_LESYMAP.get_data()
+	TMTB_LESYMAP_map = TMTB_LESYMAP.get_fdata()
 	BNT_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/BOS_NAM_RAW/stat_img.nii.gz')
-	BNT_LESYMAP_map = BNT_LESYMAP.get_data()
+	BNT_LESYMAP_map = BNT_LESYMAP.get_fdata()
 	COWA_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/MAE_COWA/stat_img.nii.gz')
-	COWA_LESYMAP_map = COWA_LESYMAP.get_data()
+	COWA_LESYMAP_map = COWA_LESYMAP.get_fdata()
 	COM_FIG_COPY_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/CONS_CFT_RAW/stat_img.nii.gz')
-	COM_FIG_COPY_LESYMAP_map = COM_FIG_COPY_LESYMAP.get_data()
+	COM_FIG_COPY_LESYMAP_map = COM_FIG_COPY_LESYMAP.get_fdata()
 	COM_FIG_RECALL_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/COM_FIG_RECALL/stat_img.nii.gz')
-	COM_FIG_RECALL_LESYMAP_map = COM_FIG_RECALL_LESYMAP.get_data()
+	COM_FIG_RECALL_LESYMAP_map = COM_FIG_RECALL_LESYMAP.get_fdata()
 
 	# Rey trial 1 and other scores have no significant LESYMAP clusters
 	REY2_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/REY_2/stat_img.nii.gz')
-	REY2_LESYMAP_map = REY2_LESYMAP.get_data()
+	REY2_LESYMAP_map = REY2_LESYMAP.get_fdata()
 	REY3_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/REY_3/stat_img.nii.gz')
-	REY3_LESYMAP_map = REY3_LESYMAP.get_data()
+	REY3_LESYMAP_map = REY3_LESYMAP.get_fdata()
 	REY4_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/REY_4/stat_img.nii.gz')
-	REY4_LESYMAP_map = REY4_LESYMAP.get_data()
+	REY4_LESYMAP_map = REY4_LESYMAP.get_fdata()
 	REY5_LESYMAP = nib.load('/home/kahwang/LESYMAP_for_Kai/REY_5/stat_img.nii.gz')
-	REY5_LESYMAP_map = REY5_LESYMAP.get_data()
+	REY5_LESYMAP_map = REY5_LESYMAP.get_fdata()
 
 	for i in df.index:
 		# load mask and get size
@@ -543,7 +601,7 @@ def determine_comparison_patients():
 		try:
 			fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
 			m = nib.load(fn)
-			res_m = resample_from_to(m, TMTB_LESYMAP).get_data()
+			res_m = resample_from_to(m, TMTB_LESYMAP).get_fdata()
 
 			if np.sum(res_m*TMTB_LESYMAP_map)==0:
 				df.loc[i, 'TMTB_Comparison'] = True
@@ -566,9 +624,9 @@ def determine_comparison_patients():
 				df.loc[i, 'Complex_Figure_Copy_Comparison'] = False
 
 			if np.sum(res_m*COM_FIG_RECALL_LESYMAP_map)==0:
-				df.loc[i, 'Complex_Figure_Recall_Comparison'] = True
+				df.loc[i, 'Complex_Figure_Delayed_Recall_Comparison'] = True
 			else:
-				df.loc[i, 'Complex_Figure_Recall_Comparison'] = False
+				df.loc[i, 'Complex_Figure_Delayed_Recall_Comparison'] = False
 
 			if np.sum(res_m*REY2_LESYMAP_map)==0:
 				df.loc[i, 'RAVLT_T2_Comparison'] = True
@@ -594,6 +652,8 @@ def determine_comparison_patients():
 			df.loc[i, 'RAVLT_T1_Comparison'] = True
 			df.loc[i, 'RAVLT_Delayed_Recall_Comparison'] = True
 			df.loc[i, 'RAVLT_Recognition_Comparison'] = True
+			df.loc[i, 'RAVLT_Learning_Comparison'] = True
+			df.loc[i, 'RAVLT_Immediate_Recall_Comparison'] = True
 
 		except:
 			continue
@@ -614,18 +674,40 @@ def neuropsych_zscore(zthreshold):
 	df['RAVLT_Delayed_Recall_z_Impaired'] = df['RAVLT_Delayed_Recall_z'] <zthreshold
 	df['RAVLT_Recognition_z_Impaired'] = df['RAVLT_Recognition_z'] <zthreshold
 	df['Complex_Figure_Copy_z_Impaired'] = df['Complex_Figure_Copy_z'] <zthreshold
-	df['Complex_Figure_Recall_z_Impaired'] = df['Complex_Figure_Recall_z'] <zthreshold
+	df['Complex_Figure_Delayed_Recall_z_Impaired'] = df['Complex_Figure_Delayed_Recall_z'] <zthreshold
 	df['RAVLT_T1_z_Impaired'] = df['RAVLT_T1_z'] <zthreshold
 	df['RAVLT_T2_z_Impaired'] = df['RAVLT_T2_z'] <zthreshold
 	df['RAVLT_T3_z_Impaired'] = df['RAVLT_T3_z'] <zthreshold
 	df['RAVLT_T4_z_Impaired'] = df['RAVLT_T4_z'] <zthreshold
 	df['RAVLT_T5_z_Impaired'] = df['RAVLT_T5_z'] <zthreshold
+	df['RAVLT_Learning_z_Impaired'] = df['RAVLT_Learning_z'] <zthreshold
+	df['RAVLT_Immediate_Recall_z_Impaired'] = df['RAVLT_Immediate_Recall_z'] <zthreshold
 
-	df['MM_impaired'] = sum([df['TMTB_z_Impaired'],
-	np.any([df['BNT_z_Impaired'] , df['COWA_z_Impaired']], axis=0),
-	np.any([df['RAVLT_Delayed_Recall_z_Impaired'] , df['RAVLT_Recognition_z_Impaired'] , df['Complex_Figure_Recall_z_Impaired']], axis=0),
-	np.any([df['Complex_Figure_Copy_z_Impaired'], df['TMTA_z_Impaired']], axis=0),
-	np.any([df['RAVLT_T1_z_Impaired'] + df['RAVLT_T1_z_Impaired'] + df['RAVLT_T1_z_Impaired'] + df['RAVLT_T1_z_Impaired'] + df['RAVLT_T1_z_Impaired']], axis=0)])
+	## 10 Domains:
+	# Visual motor, psychomotor: TMTA_z_Impaired
+	# EF: TMTB_z_Impaired
+	# Verbal Memory, immediate recall: RAVLT_Immediate_Recall_z_Impaired
+	# Memory, learning: RAVLT_Learning_z_Impaired
+	# Memory, delayed recall: RAVLT_Delayed_Recall_z_Impaired
+	# Memory, recognition: RAVLT_Recognition_z_Impaired
+	# Language, verbal fluency: COWA_z_Impaired
+	# Language, naming: BNT_z_Impaired
+	# Construction: Complex_Figure_Copy_z_Impaired
+	# Visual memory: Complex_Figure_Recall_z_Impaired
+
+
+	df['MM_impaired'] = sum([df['TMTA_z_Impaired'],
+	df['TMTB_z_Impaired'],
+	df['RAVLT_Immediate_Recall_z_Impaired'],
+	df['RAVLT_Learning_z_Impaired'],
+	df['RAVLT_Delayed_Recall_z_Impaired'],
+	df['RAVLT_Recognition_z_Impaired'],
+	df['COWA_z_Impaired'],
+	df['BNT_z_Impaired'],
+	df['Complex_Figure_Copy_z'],
+	df['Complex_Figure_Delayed_Recall_z'],
+	])
+
 	df.to_csv('~/RDSS/tmp/data_z.csv')
 
 
@@ -671,8 +753,9 @@ def plot_neuropsy_comparisons():
 
 	#need to melt df
 	tdf = pd.melt(df, id_vars = ['Sub', 'Site'],
-		value_vars = ['TMTA_z', 'Complex_Figure_Copy_z', 'TMTB_z', 'BNT_z', 'COWA_z', 'RAVLT_T1_z',
-		'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'Complex_Figure_Recall_z'], value_name = 'Z Score', var_name ='Task' )
+		value_vars = ['TMTA_z', 'TMTB_z',  'BNT_z', 'COWA_z',
+		'RAVLT_Learning_z', 'RAVLT_Immediate_Recall_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z',
+		'Complex_Figure_Delayed_Recall_z', 'Complex_Figure_Copy_z'] , value_name = 'Z Score', var_name ='Task' )
 
 
 	plt.figure(figsize=[6,4])
@@ -687,8 +770,10 @@ def plot_neuropsy_comparisons():
 				  data=tdf, dodge=True, alpha=.25)
 	fig1.legend_.remove()
 	fig1.set_ylim([-6, 6])
-	fig1.set_xticklabels(['TMT \nPart A', 'Complex Figure \nConstruction', 'TMT \nPart B', 'Boston \nNaming', 'COWA', 'RAVLT Trial 1', ' RAVLT Trial 2',
-	'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5', 'RAVLT \nRecall', 'RAVLT \nRecognition',  'Comeplex Figure \nRecall'], rotation=90)
+	fig1.set_xticklabels(['TMT \nPart A',  'TMT \nPart B', 'Boston \nNaming', 'COWA',
+	'RAVLT Learning', 'RAVLT \nImmediate Recall', 'RAVLT \nDelayed Recall', 'RAVLT \nRecognition',
+	'Comeplex Figure \nDelayed Recall', 'Complex Figure \nConstruction'], rotation=90)
+
 	plt.xlabel('')
 	#plt.show()
 	plt.tight_layout()
@@ -714,18 +799,19 @@ def cal_neuropsych_z_anchor_to_controls():
 
 def plot_neuropsych_table():
 	''' table of task impairment'''
-	ddf = df[['SubID','TMTA_z', 'Complex_Figure_Copy_z', 'TMTB_z', 'BNT_z', 'COWA_z',
-		'RAVLT_T1_z', 'RAVLT_T2_z', 'RAVLT_T3_z', 'RAVLT_T4_z', 'RAVLT_T5_z',
-		'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z', 'Complex_Figure_Recall_z','MM_impaired']]
+	ddf = df[['TMTA_z', 'TMTB_z',  'BNT_z', 'COWA_z',
+	'RAVLT_Learning_z', 'RAVLT_Immediate_Recall_z', 'RAVLT_Delayed_Recall_z', 'RAVLT_Recognition_z',
+	'Complex_Figure_Delayed_Recall_z', 'Complex_Figure_Copy_z']]
+
 	tddf = ddf.loc[df['Site']=='Th']
 	#invert tmtbz
 	tddf['TMTB_z'] = tddf['TMTB_z']*-1
 
 	tddf = tddf.set_index('SubID')
 	figt = sns.heatmap(tddf.sort_values('MM_impaired'), vmin = -5, vmax=5, center=0, cmap="coolwarm")
-	figt.set_xticklabels(['TMT Part A', 'Complex Figure Construction',  'TMT Part B', 'Boston Naming', 'COWA',
-	'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
-	'RAVLT Recall', 'RAVLT Recognition', 'Comeplex Figure Recall', '# Tasks Impaired'], rotation=90)
+	figt.set_xticklabels(['TMT \nPart A',  'TMT \nPart B', 'Boston \nNaming', 'COWA',
+	'RAVLT Learning', 'RAVLT \nImmediate Recall', 'RAVLT \nDelayed Recall', 'RAVLT \nRecognition',
+	'Comeplex Figure \nDelayed Recall', 'Complex Figure \nConstruction'], rotation=90)
 	plt.xlabel('')
 	plt.ylabel('Patient')
 	plt.tight_layout()
@@ -768,19 +854,16 @@ if __name__ == "__main__":
 	#load_and_normalize_neuropsych_data()
 	#Cal_lesion_size()
 	#determine_comparison_patients()
-	neuropsych_zscore(-1.5)
+	#neuropsych_zscore(-1.5)
 
 	###################
 	# compare test scores
 	df = pd.read_csv('~/RDSS/tmp/data_z.csv')
 
 	### t tests
-
-	# visual-motor, Construction
+	# visual-motor
 	print('TMTA')
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['TMTB_Comparison']==True)]['TMTA_z'].values, df.loc[df['Site']=='Th']['TMTA_z'].values))
-	print('Complex_Figure_Copy_Comparison')
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
 
 	# executive function
 	print('TMTB')
@@ -797,29 +880,30 @@ if __name__ == "__main__":
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Delayed_Recall_z'].values, df.loc[df['Site']=='Th']['RAVLT_Delayed_Recall_z'].values))
 	print('RAVLT, recog')
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Recognition_z'].values, df.loc[df['Site']=='Th']['RAVLT_Recognition_z'].values))
-
 	print('RAVLT, learning trials')
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_T1_z'].values, df.loc[df['Site']=='Th']['RAVLT_T1_z'].values))
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T2_Comparison']==True)]['RAVLT_T2_z'].values, df.loc[df['Site']=='Th']['RAVLT_T2_z'].values))
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T3_Comparison']==True)]['RAVLT_T3_z'].values, df.loc[df['Site']=='Th']['RAVLT_T3_z'].values))
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T4_Comparison']==True)]['RAVLT_T4_z'].values, df.loc[df['Site']=='Th']['RAVLT_T4_z'].values))
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')& (df['RAVLT_T5_Comparison']==True)]['RAVLT_T5_z'].values, df.loc[df['Site']=='Th']['RAVLT_T5_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Learning_z'].values, df.loc[df['Site']=='Th']['RAVLT_Learning_z'].values))
+	print('RAVLT, immediate recall')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['RAVLT_Immediate_Recall_z'].values, df.loc[df['Site']=='Th']['RAVLT_Immediate_Recall_z'].values))
 
+	# complex figure
 	print('complex figure, copy and recall')
-	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Recall_Comparison']==True)]['Complex_Figure_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Recall_z'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Delayed_Recall_Comparison']==True)]['Complex_Figure_Delayed_Recall_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Delayed_Recall_z'].values))
+	print('Complex_Figure_Copy_Comparison')
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
+
 
 	#plot_neuropsy_indiv_comparisons()
-	#plot_neuropsy_comparisons()
+	plot_neuropsy_comparisons()
 
 	###################
 	# plot lesion overlap
-	lesion_overlap_nii = draw_lesion_overlap('Th')
-	lesion_overlap_nii.to_filename('Th_lesion_overlap.nii')
+	#lesion_overlap_nii = draw_lesion_overlap('Th')
+	#lesion_overlap_nii.to_filename('Th_lesion_overlap.nii')
 	#plotting.plot_stat_map(lesion_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=5, colorbar = False, black_bg=False, cmap='gist_ncar')
 	#plotting.show()
 
-	lesion_overlap_nii = draw_lesion_overlap('ctx')
-	lesion_overlap_nii.to_filename('Ctx_lesion_overlap.nii')
+	#lesion_overlap_nii = draw_lesion_overlap('ctx')
+	#lesion_overlap_nii.to_filename('Ctx_lesion_overlap.nii')
 	#plotting.plot_stat_map(lesion_overlap_nii, bg_img = mni_template, display_mode='z', cut_coords=5, colorbar = False, black_bg=False, cmap='gist_ncar')
 	#plotting.show()
 
@@ -827,7 +911,43 @@ if __name__ == "__main__":
 	################################
 	# Figure SX.  Correlation among scores
 	################################
-	def plot_corr_table():
+
+	# create cross correlation table, and do clustering to find clusters of test variables
+	# cdf = df.loc[df['Site']=='ctx']
+	#
+	# ### collect data on each task
+    # #'Complex_Figure_Copy',
+	# #'Complex_Figure_Recall'
+	#
+	# list_of_neuropsych_z = ['TMTA', 'TMTB', 'BNT', 'COWA', 'RAVLT_T1', 'RAVLT_T2', 'RAVLT_T3', 'RAVLT_T4', 'RAVLT_T5', 'RAVLT_Delayed_Recall', 'RAVLT_Recognition']  #
+	# crdf = pd.DataFrame()
+	# for neuropsych in list_of_neuropsych_z:
+	# 	crdf = pd.concat([crdf, cdf[neuropsych+'_z']], axis=1)
+	# # invert TMT
+	# #crdf['TMTA_z'] = crdf['TMTA_z'] * -1
+	# #crdf['TMTB_z'] = crdf['TMTB_z'] * -1
+	#
+	# mat = crdf.corr().to_numpy()
+	# from sklearn.cluster import KMeans
+	# cluster_sizes = [2, 3, 4, 5, 6, 7, 8, 9, 10]
+	# from sklearn.metrics import silhouette_score
+	#
+	#
+	# inertias = np.zeros(len(cluster_sizes))
+	# sil = np.zeros(len(cluster_sizes))
+	# for i, n_clusters in enumerate(cluster_sizes):
+	# 	est = KMeans(n_clusters = n_clusters, n_init=100)
+	# 	est.fit(mat.T)
+	# 	inertias[i] = est.inertia_
+	# 	print(est.inertia_)
+	# 	print(est.labels_)
+	# 	sil[i] = (silhouette_score(mat.T, est.labels_, metric = 'euclidean'))
+	#
+	# sns.lineplot(y=inertias, x=cluster_sizes)
+	# plt.show()
+
+
+	def plot_corr_table(mat):
 		corrdf = pd.read_csv('~/RDSS/tmp/crosscorr.csv')
 		corrdf = corrdf.set_index('Tasks')
 		corrplot = sns.heatmap(corrdf, vmin = -1, vmax=1, center=0, cmap="coolwarm")
@@ -847,12 +967,11 @@ if __name__ == "__main__":
 
 
 
-
 	################################
 	# Figure 2.  Plot table of z scores to show mutlimodal impairment
 	################################
 
-	#plot_neuropsych_table()
+	plot_neuropsych_table()
 
 
 	##### Now draw lesions overlap for patients with and without multimodal impairment
@@ -886,10 +1005,10 @@ if __name__ == "__main__":
 
 		thalamus_mask_data = nib.load('/home/kahwang/0.5mm/tha_0.5_mask.nii.gz').get_fdata()
 		thalamus_mask_data = thalamus_mask_data>0
-		list_of_neuropsych_z = ['TMTA', 'TMTB', 'BNT', 'COWA', 'RAVLT_Delayed_Recall', 'RAVLT_Recognition', 'Complex_Figure_Copy',
-		 'Complex_Figure_Recall', 'RAVLT_T1', 'RAVLT_T2', 'RAVLT_T2', 'RAVLT_T3', 'RAVLT_T4', 'RAVLT_T5']
-		list_of_neuropsych_var = ['TMT part A', 'TMT part B', 'Boston Naming', 'COWA', 'RAVLT Recall', 'RAVLT Recognition', 'Complex Figure Construction',
- 		 'Complex Figure Recall', 'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5']
+		list_of_neuropsych_z = ['TMTA', 'TMTB', 'BNT', 'COWA', 'RAVLT_Delayed_Recall', 'RAVLT_Recognition',
+ 		'RAVLT_T1', 'RAVLT_T2', 'RAVLT_T3', 'RAVLT_T4', 'RAVLT_T5']
+		list_of_neuropsych_var = ['TMT part A', 'TMT part B', 'Boston Naming', 'COWA', 'RAVLT Recall', 'RAVLT Recognition',
+ 		'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5']
 		h = nib.load('/home/kahwang/0.5mm/0902.nii.gz')
 
 		mask_niis = {}
@@ -943,14 +1062,14 @@ if __name__ == "__main__":
 			# or use terminal, do 3dcalc -a BNT_lesionmask_impaired.percentage.overlap.nii.gz -b COWA_lesionmask_impaired.percentage.overlap.nii.gz -expr '(a+b)/2' -prefix language_impairment_mask.nii.gz
 
 
-		VM_mask = np.max([mask_niis['TMT part A'].get_fdata(), mask_niis['Complex Figure Construction'].get_fdata()], axis=0)
-		CF_mask = mask_niis['Complex Figure Construction'].get_fdata()
+		#VM_mask = np.max([mask_niis['TMT part A'].get_fdata(), mask_niis['Complex Figure Construction'].get_fdata()], axis=0)
+		#CF_mask = mask_niis['Complex Figure Construction'].get_fdata()
 		RAVLT_mask = np.max([mask_niis['RAVLT Trial 1'].get_fdata(),
 			mask_niis['RAVLT Trial 2'].get_fdata(),
 			mask_niis['RAVLT Trial 3'].get_fdata(),
 			mask_niis['RAVLT Trial 4'].get_fdata(),
 			mask_niis['RAVLT Trial 5'].get_fdata(),
-			mask_niis['RAVLT Recall'].get_fdata(), mask_niis['RAVLT Recognition'].get_fdata()], axis=0)
+			], axis=0)
 
 		Verbal_mask = np.max([mask_niis['Boston Naming'].get_fdata(), mask_niis['COWA'].get_fdata()], axis=0)
 		Memory_mask = np.max([mask_niis['RAVLT Recall'].get_fdata(), mask_niis['RAVLT Recognition'].get_fdata()], axis=0)
@@ -961,57 +1080,58 @@ if __name__ == "__main__":
 		RAVLT_mask.to_filename('images/RAVLT_overlap.nii.gz')
 		Verbal_mask = nilearn.image.new_img_like(h, Verbal_mask)
 		Verbal_mask.to_filename('images/Verbal_overlap.nii.gz')
-		VM_mask = nilearn.image.new_img_like(h, VM_mask)
-		VM_mask.to_filename('images/VM_overlap.nii.gz')
+		#VM_mask = nilearn.image.new_img_like(h, VM_mask)
+		#VM_mask.to_filename('images/VM_overlap.nii.gz')
 		Memory_mask = nilearn.image.new_img_like(h, Memory_mask)
 		Memory_mask.to_filename('images/Memory_overlap.nii.gz')
 		TMTB_mask = nilearn.image.new_img_like(h, TMTB_mask)
 		TMTB_mask.to_filename('images/TMTB_overlap.nii.gz')
 		TMTA_mask = nilearn.image.new_img_like(h, TMTA_mask)
 		TMTA_mask.to_filename('images/CF_overlap.nii.gz')
-		CF_mask = nilearn.image.new_img_like(h, CF_mask)
-		CF_mask.to_filename('images/CF_overlap.nii.gz')
+		#CF_mask = nilearn.image.new_img_like(h, CF_mask)
+		#CF_mask.to_filename('images/CF_overlap.nii.gz')
 
 		# count number of task lesion mask overlap
-		Num_task_mask = 1.0*(RAVLT_mask.get_fdata()>0) + 1.0*(Verbal_mask.get_fdata()>0) + 1.0*(CF_mask.get_fdata()>0) + 1.0*(TMTB_mask.get_fdata()>0) + 1.0*(TMTA_mask.get_fdata()>0)
+		Num_task_mask = 1.0*(RAVLT_mask.get_fdata()>0) + 1.0*(Verbal_mask.get_fdata()>0) + 1.0*(Memory_mask.get_fdata()>0) + 1.0*(TMTB_mask.get_fdata()>0) #1.0*(TMTA_mask.get_fdata()>0)
 		Num_task_mask = nilearn.image.new_img_like(h, Num_task_mask)
 		Num_task_mask.to_filename('images/Num_of_task_impaired_overlap.nii.gz')
 
-		return Num_task_mask, TMTB_mask, Memory_mask, VM_mask, Verbal_mask, RAVLT_mask
+		return Num_task_mask, TMTA_mask, TMTB_mask, Memory_mask, Verbal_mask, RAVLT_mask
 
 
-	Num_task_mask, TMTB_mask, Memory_mask, VM_mask, Verbal_mask, RAVLT_mask = map_lesion_unique_masks(df)
+	#Num_task_mask, TMTA_mask, TMTB_mask, Memory_mask, Verbal_mask, RAVLT_mask = map_lesion_unique_masks(df)
 
 
 
 
 	################################
-	# Figure 3  Compare lesion site to PC values
+	# Figure 3  Compare lesion sites' PC values
 	################################
+	def PC_model():
+		rsfc_pc = nib.load('images/PC.nii.gz')
+		from nilearn.image import resample_to_img
+		rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
 
-	rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
-	from nilearn.image import resample_to_img
-	rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
+		PCs={}
+		for t in [4,3,2,1]:
+			tmp_mask = nilearn.image.new_img_like(Num_task_mask, Num_task_mask.get_fdata()==t)
+			PCs[t]= masking.apply_mask(rsfc_pc05, tmp_mask)
+			print(np.median(masking.apply_mask(rsfc_pc05, tmp_mask)))
 
-	PCs={}
-	for t in [5,4,3,2,1]:
-		tmp_mask = nilearn.image.new_img_like(Num_task_mask, Num_task_mask.get_fdata()==t)
-		PCs[t]= masking.apply_mask(rsfc_pc05, tmp_mask)
-		print(np.median(masking.apply_mask(rsfc_pc05, tmp_mask)))
+		#i=0
+		pcdf = pd.DataFrame()
+		for t in [4,3,2,1]:
+			pdf = pd.DataFrame()
+			pdf['PC'] = PCs[t]
+			pdf['Task#'] = t
 
-	#i=0
-	pcdf = pd.DataFrame()
-	for t in [5,4,3,2,1]:
-		pdf = pd.DataFrame()
-		pdf['PC'] = PCs[t]
-		pdf['Task#'] = t
+			pcdf =pd.concat([pcdf, pdf])
 
-		pcdf =pd.concat([pcdf, pdf])
+		sns.kdeplot(x='PC', data=pcdf, hue='Task#', common_norm = False)
+		plt.show()
 
-	sns.kdeplot(x='PC', data=pcdf, hue='Task#', common_norm = False)
-	plt.show()
-	#from scipy import stats
-	#stats.ks_2samp(PCs[5], PCs[2])
+
+
 
 
 
