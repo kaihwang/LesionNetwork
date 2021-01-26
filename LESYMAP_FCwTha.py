@@ -113,7 +113,7 @@ MGH_fn = '/home/kahwang/bsh/MGH/MGH/*/MNINonLinear/rfMRI_REST_ncsreg.nii.gz'
 MGH_files = glob.glob(MGH_fn)
 
 NKI_fn = '/data/backed_up/shared/NKI/*/MNINonLinear/rfMRI_REST_mx_1400_ncsreg.nii.gz'
-NKI_files = glob.glob(MGH_fn)
+NKI_files = glob.glob(NKI_fn)
 datafiles = [NKI_files, MGH_files]
 datasets=['NKI', 'MGH']
 
