@@ -977,32 +977,6 @@ if __name__ == "__main__":
 	#plot_neuropsych_table()
 
 
-	##### Now draw lesions overlap for patients with and without multimodal impairment
-	##### plot lesion masks for these subjects
-
-	# plot lesion overlap of patients that show MM lesion or SM lesions
-	def plt_MM_SM_lesion_mask():
-		m=0
-		for s in ['2105', '2552', '2092', 'ca085', 'ca093', 'ca104', 'ca105', '1692', '1830', 3049]:
-
-			fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
-			m = m + nib.load(fn).get_fdata()
-
-		h = nib.load('/home/kahwang/0.5mm/0902.nii.gz')
-		mmlesion_overlap_nii = nilearn.image.new_img_like(h, m)
-		mmlesion_overlap_nii.to_filename('images/mmlesion_overlap.nii.gz')
-
-		m=0
-		for s in ['1809', '1105', '2781', '0902', '3184', 'ca018', 'ca041', '4036', '4032', '4041']:
-
-			fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
-			m = m + nib.load(fn).get_fdata()
-
-		h = nib.load('/home/kahwang/0.5mm/0902.nii.gz')
-		smlesion_overlap_nii = nilearn.image.new_img_like(h, m)
-		smlesion_overlap_nii.to_filename('images/smlesion_overlap.nii.gz')
-
-
 	def map_lesion_unique_masks(df):
 		''' map each neuropsych's unique lesion mask'''
 
@@ -1109,60 +1083,168 @@ if __name__ == "__main__":
 	# Figure 3  Compare lesion sites' PC values
 	################################
 
+	##### Now draw lesions overlap for patients with and without multimodal impairment
+	##### plot lesion masks for these subjects
+
+	# plot lesion overlap of patients that show MM lesion or SM lesions
+	def plt_MM_SM_lesion_mask(df):
+		thalamus_mask_data = nib.load('/home/kahwang/0.5mm/tha_0.5_mask.nii.gz').get_fdata()
+		thalamus_mask_data = thalamus_mask_data>0
+		m=np.zeros(np.shape(nib.load('images/Num_of_task_impaired_overlap.nii.gz').get_fdata))
+		for s in df.loc[(df['MM_impaired']>4) & (df['Site'] =='Th')]['Sub']:
+			try:
+				fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+				m = m + nib.load(fn).get_fdata()
+			except:
+				continue
+		m = m * thalamus_mask_data
+		h = nib.load('images/Num_of_task_impaired_overlap.nii.gz')
+		mmlesion_overlap_nii = nilearn.image.new_img_like(h, 1.0*m)
+		mmlesion_overlap_nii.to_filename('images/mmlesion_overlap.nii.gz')
+
+		m=np.zeros(np.shape(nib.load('images/Num_of_task_impaired_overlap.nii.gz').get_fdata))
+		for s in df.loc[(df['MM_impaired']<1) & (df['Site'] =='Th')]['Sub']:
+			try:
+				fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+				m = m + nib.load(fn).get_fdata()
+			except:
+				continue
+		m = m * thalamus_mask_data
+		h = nib.load('images/Num_of_task_impaired_overlap.nii.gz')
+		smlesion_overlap_nii = nilearn.image.new_img_like(h, 1.0*m)
+		smlesion_overlap_nii.to_filename('images/smlesion_overlap.nii.gz')
+
+		diff_nii = 1*(mmlesion_overlap_nii.get_fdata()>0) - 1*(smlesion_overlap_nii.get_fdata()>0)
+		diff_nii_img = nilearn.image.new_img_like(h, 1.0*diff_nii)
+		diff_nii_img.to_filename('images/mm_v_sm_overlap.nii.gz')
+
+		mm_unique = nilearn.image.new_img_like(h, 1*(diff_nii ==1))
+		sm_unique = nilearn.image.new_img_like(h, 1*(diff_nii ==-1))
+
+		return diff_nii_img, mm_unique, sm_unique
+
+	diff_nii_img, mm_unique, sm_unique = plt_MM_SM_lesion_mask(df)
 	### calculate PC vectors for MGH, 7T, NKI, full corr for FC.
+	# use LESYMAP_FCwTha.py
+
+	##### Look at diff in PC between SM and MM lesion sites
+	#rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
+	#from nilearn.image import resample_to_img
+	#rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
+	#rsfc_pc05.to_filename('images/PC.5.nii.gz')
+	#rsfc_pc05 = nib.load('images/PC.5.nii.gz')
+
+	#### load PC, ave across subjects and thresholds
+	thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+	thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
+	thalamus_mask_data = thalamus_mask_data>0
+	thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
+	pc_vectors = np.load('data/MGH_pc_vectors.npy')
+	pcs = np.nanmean(np.nanmean(pc_vectors, axis =2), axis=1)
+	pc_img = masking.unmask(pcs, thalamus_mask)
+	rsfc_pc05 = resample_to_img(pc_img, diff_nii_img, interpolation='nearest')
+	pc_img.to_filename('images/MGH_pc.nii.gz')
+
+	## comile df for kde plot
+	PCs={}
+	PCs['MM']= masking.apply_mask(rsfc_pc05, mm_unique)
+	PCs['SM']= masking.apply_mask(rsfc_pc05, sm_unique)
+	print(np.mean(PCs['MM']))
+	print(np.mean(PCs['SM']))
+
+	i=0
+	pcdf = pd.DataFrame()
+	for t in ['MM', 'SM']:
+		pdf = pd.DataFrame()
+		pdf['PC'] = PCs[t]
+		pdf['#Impairment'] = t
+
+		pcdf =pd.concat([pcdf, pdf])
+
+	#kde plot
+	plt.close()
+	sns.set_context("paper")
+	plt.figure(figsize=[4,4])
+	sns.kdeplot(x='PC', data=pcdf, hue='#Impairment', common_norm = False, legend = False, fill=True, linewidth=3, alpha = .5, palette=['r', '#0269FE'])
+	fn = '/home/kahwang/RDSS/tmp/MM_SM_kde.pdf'
+	plt.savefig(fn)
+
+	#nilearn.image.new_img_like(rsfc_pc05, (rsfc_pc05.get_fdata()-0.3)*thalamus_mask_data).to_filename('images/PC-.4.nii.gz')
 
 
-	### PC MLM model
-	def write_indiv_subj_PC(df, Num_task_mask):
+	### ### ### Stats model for PC comaparison between SM and MM
+	def write_indiv_subj_PC(df, diff_nii_img):
 		#load PC vectors and tha mask to put voxel values back to nii object
 		pc_vectors = np.load('data/MGH_pc_vectors.npy') #resting state FC's PC. dimension 236 (sub) by 2xxx (tha voxel)
 		thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
 		thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
 		thalamus_mask_data = thalamus_mask_data>0
 		thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
-		Num_task_mask_2mm = resample_to_img(Num_task_mask, thalamus_mask, interpolation='nearest')
+		diff_nii_img_2mm = resample_to_img(diff_nii_img, thalamus_mask, interpolation='nearest')
 
-		for threshold in [0,1,2,3,4,5,6,7,8]:
+		#for threshold in [0,1,2,3,4,5,6,7,8]:
 		# create DF
-			pcdf = pd.DataFrame()
-			i=0
-			for p in [0,1,2,3,4,5,6,7,8,9]:  #np.unique(Num_task_mask_2mm.get_fdata())[np.unique(Num_task_mask_2mm.get_fdata())>0]
+		pcdf = pd.DataFrame()
+		i=0
+		for p in [-1, 1]:  #np.unique(Num_task_mask_2mm.get_fdata())[np.unique(Num_task_mask_2mm.get_fdata())>0]
 
-				for s in np.arange(0, pc_vectors.shape[1]):
-					pc = pc_vectors[:,s, threshold]
-					fcpc_image = masking.unmask(pc, thalamus_mask).get_fdata()
-					#rsfc_pc05 = resample_to_img(fcpc_image, Num_task_mask)
-					#np.mean(rsfc_pc05.get_fdata()[Num_task_mask.get_fdata()==1])
+			for s in np.arange(0, pc_vectors.shape[1]):
+				pc = np.nanmean(pc_vectors[:,s,:], axis = 1)
+				fcpc_image = masking.unmask(pc, thalamus_mask).get_fdata()
+				#rsfc_pc05 = resample_to_img(fcpc_image, Num_task_mask)
+				#np.mean(rsfc_pc05.get_fdata()[Num_task_mask.get_fdata()==1])
 
-					pcdf.loc[i, 'Subject'] = s
-					pcdf.loc[i, 'Cluster'] = p
-					pcdf.loc[i, 'PC'] = np.nanmean(fcpc_image[(Num_task_mask_2mm.get_fdata()==p) & thalamus_mask_data])
-					#pcdf.loc[i, 'MM_impaired_num'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]
-					#pcdf.loc[i, 'Size'] = df.loc[df['Sub'] == p]['Lesion Size'].values[0]
-					i = i+1
+				pcdf.loc[i, 'Subject'] = s
+				pcdf.loc[i, 'Cluster'] = p
+				pcdf.loc[i, 'PC'] = np.nanmean(fcpc_image[(diff_nii_img_2mm.get_fdata()==p) & thalamus_mask_data])
+				#pcdf.loc[i, 'MM_impaired_num'] = df.loc[df['Sub'] == p]['MM_impaired'].values[0]
+				#pcdf.loc[i, 'Size'] = df.loc[df['Sub'] == p]['Lesion Size'].values[0]
+				i = i+1
 
-			pcdf = pcdf.dropna()
-			#pcdf.to_csv('~/RDSS/tmp/pcdf.csv')
+		pcdf = pcdf.dropna()
+		#pcdf.to_csv('~/RDSS/tmp/pcdf.csv')
 
-			#check outliers
-			
-			md = smf.mixedlm("PC ~ Cluster ", data = pcdf ,re_formula = '1', groups=pcdf['Subject']).fit() #re_formula = 'Cluster'
-			print(threshold)
-			print(md.summary())
+		#check outliers
 
-	sns.lmplot(x='Cluster', y='PC', data = pcdf)
-	plt.show()
+		#model, random intercept
+		md = smf.mixedlm("PC ~ Cluster ", data = pcdf ,re_formula = '1', groups=pcdf['Subject']).fit() #re_formula = 'Cluster'
+		#print(threshold)
+		print(md.summary())
 
+		avePC = np.nanmean(np.nanmean(pc_vectors, axis=2), axis=1)
+		avePC_image = masking.unmask(avePC, thalamus_mask)
+
+		return avePC_image, pcdf
+
+
+	#### plot comparison between SM and MM PC values
+	avePC_image, pcdf = write_indiv_subj_PC(df, diff_nii_img)
+	#fig4 = sns.lineplot(x='Cluster', y='PC', data = pcdf, hue='Subject', alpha = .1, legend=False)
+	#fig4 = sns.pointplot(x="Cluster", y='PC', join=True, hue='Subject', dodge=False, data=pcdf, alpha = .1, legend=False)
+	plt.close()
+	plt.figure(figsize=[4,4])
+	fig4 = sns.pointplot(x="Cluster", y='PC', join=False, dodge=False, data=pcdf, hue='Cluster', palette=['#0269FE', 'r'])
+	fig4 = sns.stripplot(x="Cluster", y="PC",
+					  data=pcdf, dodge=False, jitter = False, alpha=.03, palette=['#0269FE', 'r'])
+	fig4.legend_.remove()
+	fig4.set_xticklabels(['SM',  'MM'])
+	fn = '/home/kahwang/RDSS/tmp/PC_MMvSM.pdf'
+	plt.savefig(fn)
+	#plt.show()
+
+
+	# does PC correlate with different lesions associate with dff num of tasks?
 	def PC_model(Num_task_mask):
 		rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
 		from nilearn.image import resample_to_img
 		rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
 
 		PCs={}
-		v = np.unique(Num_task_mask.get_fdata())
+		#v = np.unique(Num_task_mask.get_fdata())
+		#v=[-1, 1]
 		for t in v:
-			tmp_mask = nilearn.image.new_img_like(Num_task_mask, Num_task_mask.get_fdata()==t)
-			PCs[t]= masking.apply_mask(rsfc_pc05, tmp_mask)
+			##tmp_mask = nilearn.image.new_img_like(Num_task_mask, Num_task_mask.get_fdata()==t)
+			PCs[t]= masking.apply_mask(rsfc_pc05, diff)
 			print(np.median(masking.apply_mask(rsfc_pc05, tmp_mask)))
 
 		return PCs
@@ -1179,28 +1261,39 @@ if __name__ == "__main__":
 		sns.kdeplot(x='PC', data=pcdf, hue='Task#', common_norm = False)
 		plt.show()
 
+		smf.ols("MM_impaired ~ PC", pdf).fit().summary()
 
-	PCs = PC_model(Num_task_mask)
+	# PCs = PC_model(Num_task_mask)
+	#
+	# rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
+	# rsfc_pc = avePC_image
+	# #from nilearn.image import resample_to_img
+	# rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
+	#
+	# pdf = df.loc[(df['Site'] == 'Th') & (df['MNI_Mask'] == 'T')]
+	# #pdf.loc[pdf.loc['Sub']==902,'Sub'] = '0902'
+	# for i in pdf.index:
+	# 	s = pdf.loc[i, 'Sub']
+	# 	if pdf.loc[i, 'Sub'] == '902':
+	# 		s = '0902'
+	#
+	# 	fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
+	# 	pmask = nib.load(fn)
+	# 	pdf.loc[i, 'PC'] = np.mean(masking.apply_mask(rsfc_pc05, pmask))
+	#
+	# pdf['Size'] = pdf['Lesion Size']
+	# pdf['Weight'] = pdf['Size'] * pdf['PC']
+	# smf.ols("MM_impaired ~ PC", pdf).fit().summary()
+	# scipy.stats.mannwhitneyu(pdf.loc[pdf['MM_impaired']>1]['PC'].values, pdf.loc[pdf['MM_impaired']<=1]['PC'].values)
+	#
 
-	rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
-	#from nilearn.image import resample_to_img
-	#rsfc_pc05 = resample_to_img(rsfc_pc, Num_task_mask)
+	################################
+	# Figure 4  LESYMap analyses
+	################################
 
-	pdf = df.loc[(df['Site'] == 'Th') & (df['MNI_Mask'] == 'T')]
-	#pdf.loc[pdf.loc['Sub']==902,'Sub'] = '0902'
-	for i in pdf.index:
-		s = pdf.loc[i, 'Sub']
-		if pdf.loc[i, 'Sub'] == '902':
-			s = '0902'
 
-		fn = '/home/kahwang/0.5mm/%s.nii.gz' %s
-		pmask = nib.load(fn)
-		pdf.loc[i, 'PC'] = np.mean(masking.apply_mask(rsfc_pc05, pmask))
 
-	pdf['Size'] = pdf['Lesion Size']
-	pdf['Weight'] = pdf['Size'] * pdf['PC']
-	smf.ols("MM_impaired ~ PC + Size", pdf).fit().summary()
-	scipy.stats.mannwhitneyu(pdf.loc[pdf['MM_impaired']>1]['PC'].values, pdf.loc[pdf['MM_impaired']<=1]['PC'].values)
+
 
 
 
