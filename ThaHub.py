@@ -5,6 +5,7 @@ import seaborn as sns
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from nibabel.processing import resample_from_to
+from nilearn.image import resample_to_img
 import nilearn
 import scipy
 import os
@@ -1288,13 +1289,86 @@ if __name__ == "__main__":
 	#
 
 	################################
-	# Figure 4  LESYMap analyses
+	# Figure 4  LESYMap whiet matter tractography analyses
 	################################
 
+	#create the overlap of TMTB, COWA, BNT, Complex_Figure_Recall lesion masks
+	TMTB_mask = nib.load("images/TMTB_lesionmask_pcount.nii.gz")
+	COWA_mask = nib.load("images/COWA_lesionmask_pcount.nii.gz")
+	BNT_mask = nib.load("images/BNT_lesionmask_pcount.nii.gz")
+	COM_Recall_mask = nib.load("images/Complex_Figure_Delayed_Recall_lesionmask_pcount.nii.gz")
+
+	four_task_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(COWA_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
+	four_task_overlap.to_filename('images/four_tasks_lesionmask_overlap.nii.gz')
+	TMTB_COWA_BNT_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(COWA_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0))
+	TMTB_COWA_BNT_overlap.to_filename('images/TMTB_COWA_BNT_lesionmask_overlap.nii.gz')
+	TMTB_COWA_COM_Recall_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(COWA_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
+	TMTB_COWA_COM_Recall_overlap.to_filename('images/TMTB_COWA_COM_Recall_lesionmask_overlap.nii.gz')
+	TMTB_BNT_COM_Recall_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
+	TMTB_BNT_COM_Recall_overlap.to_filename('images/TMTB_BNT_COM_Recall_lesionmask_overlap.nii.gz')
+	COWA_BNT_COM_Reacall_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(COWA_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
+	COWA_BNT_COM_Reacall_overlap.to_filename('images/COWA_BNT_COM_Reacall_lesionmask_overlap.nii.gz')
 
 
+	#create the overlap of TMTB, COWA, BNT, Complex_Figure_Recall WM density maps
+	TMTB_wm_endpoint = nib.load("images/lesymaps/WMtracks/TMTB_endpoint.nii.gz")
+	COWA_wm_endpoint = nib.load("images/lesymaps/WMtracks/COWA_endpoint.nii.gz")
+	BNT_wm_endpoint = nib.load("images/lesymaps/WMtracks/BNT_endpoint.nii.gz")
+	COM_Recall_wm_endpoint = nib.load("images/lesymaps/WMtracks/COM_Recall_endpoint.nii.gz")
+
+	four_task_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
+	four_task_WM_overlap.to_filename('images/four_task_WM_overlap.nii.gz')
+	TMTB_COWA_BNT_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0))
+	TMTB_COWA_BNT_WM_overlap.to_filename('images/TMTB_COWA_BNT_WM_overlap.nii.gz')
+	TMTB_COWA_COM_Recall_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
+	TMTB_COWA_COM_Recall_WM_overlap.to_filename('images/TMTB_COWA_COM_Recall_WM_overlap.nii.gz')
+	TMTB_BNT_COM_Recall_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
+	TMTB_BNT_COM_Recall_WM_overlap.to_filename('images/TMTB_BNT_COM_Recall_WM_overlap.nii.gz')
+	COWA_BNT_COM_Reacall_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
+	COWA_BNT_COM_Reacall_WM_overlap.to_filename('images/COWA_BNT_COM_Reacall_WM_overlap.nii.gz')
+
+	WM_overlaps = [four_task_WM_overlap, TMTB_COWA_BNT_WM_overlap, TMTB_COWA_COM_Recall_WM_overlap, TMTB_BNT_COM_Recall_WM_overlap, COWA_BNT_COM_Reacall_WM_overlap]
+	lesion_overlaps = [four_task_overlap, TMTB_COWA_BNT_overlap, TMTB_COWA_COM_Recall_overlap, TMTB_BNT_COM_Recall_overlap, COWA_BNT_COM_Reacall_overlap]
+	# Compare to number of overlapping WM end point voxels inside and outside overlapping lesion masks
+
+	for i in [0,1,2,3,4]:
+		thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+		wm_density = resample_to_img(WM_overlaps[i], thalamus_mask, interpolation = 'nearest')
+		lesion_mask = resample_to_img(lesion_overlaps[i], thalamus_mask, interpolation = 'nearest')
+
+		if i == 0:
+			wm_density_data = 1*(wm_density.get_fdata()==4) * 1*(thalamus_mask.get_fdata()>0)
+			lesion_mask_data = 1*(lesion_mask.get_fdata()==4) * 1*(thalamus_mask.get_fdata()>0)
+		elif i > 0:
+			wm_density_data = 1*(wm_density.get_fdata()==3) * 1*(thalamus_mask.get_fdata()>0)
+			lesion_mask_data = 1*(lesion_mask.get_fdata()==3) * 1*(thalamus_mask.get_fdata()>0)
+		outside_lesion_mask_data = 1*(lesion_mask.get_fdata()==0) * 1*(thalamus_mask.get_fdata()>0)
+
+		wdf = pd.DataFrame()
+		wdf.loc[0, 'Location'] ='Inside \noverlapping zone'
+		print("in mask:")
+		print(np.sum(wm_density_data[lesion_mask_data==1]))
+		wdf.loc[0, 'Endpoint voxel count'] = np.sum(wm_density_data[lesion_mask_data==1])
+		print("outside mask:")
+		wdf.loc[1, 'Location'] ='Outside \noverlapping zone'
+		print(np.sum(wm_density_data[outside_lesion_mask_data==1]))
+		wdf.loc[1, 'Endpoint voxel count'] = np.sum(wm_density_data[outside_lesion_mask_data==1])
+		plt.figure(figsize=[3,3])
+		figw = sns.barplot(x="Location", y="Endpoint voxel count", data=wdf)
+		plt.tight_layout()
+		figw.set_ylim([0, 30])
+		#plt.show()
+		fn = '/home/kahwang/RDSS/tmp/wmdensity_bar_%s.png' %i
+		plt.savefig(fn)
 
 
-
+	# find patients
+	# No patients with 3 common impairments among these tasks...
+	# df.loc[(df['TMTB_z_Impaired'] == True) & (df['COWA_z_Impaired'] == True)]
+	#df.loc[(df['BNT_z_Impaired'] == True) & (df['COWA_z_Impaired'] == True)]
+	#df.loc[(df['BNT_z_Impaired'] == True) & (df['TMTB_z_Impaired'] == True)]
+	#df.loc[(df['TMTB_z_Impaired'] == True) & (df['Complex_Figure_Delayed_Recall_z_Impaired'] == True)]
+	#df.loc[(df['BNT_z_Impaired'] == True) & (df['Complex_Figure_Delayed_Recall_z_Impaired'] == True)]
+	#df.loc[(df['COWA_z_Impaired'] == True) & (df['Complex_Figure_Delayed_Recall_z_Impaired'] == True)]
 
 #end of line
