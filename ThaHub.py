@@ -15,6 +15,7 @@ import statsmodels.formula.api as smf
 from nilearn import masking
 from nilearn import plotting
 import matplotlib.pyplot as plt
+from scipy.stats import zscore
 sns.set_context("paper")
 ###########
 ########### Test multidomain hub properties in the human thalamus
@@ -913,7 +914,7 @@ if __name__ == "__main__":
 
 
 	################################
-	# Figure SX.  Correlation among scores
+	# Supplemental FigureX.  Correlation among scores
 	################################
 
 	#create cross correlation table, and do clustering to find clusters of test variables
@@ -977,7 +978,7 @@ if __name__ == "__main__":
 
 	#plot_neuropsych_table()
 
-
+	### Fig 2B Plot lesion sites associate with each task, and its overlap
 	def map_lesion_unique_masks(df):
 		''' map each neuropsych's unique lesion mask'''
 
@@ -1084,10 +1085,9 @@ if __name__ == "__main__":
 	# Figure 3  Compare lesion sites' PC values
 	################################
 
-	##### Now draw lesions overlap for patients with and without multimodal impairment
-	##### plot lesion masks for these subjects
-
-	# plot lesion overlap of patients that show MM lesion or SM lesions
+	# Fib 3A
+	### Now draw lesions overlap for patients with and without multimodal impairment
+	### plot lesion masks for these subjects
 	def plt_MM_SM_lesion_mask(df):
 		thalamus_mask_data = nib.load('/home/kahwang/0.5mm/tha_0.5_mask.nii.gz').get_fdata()
 		thalamus_mask_data = thalamus_mask_data>0
@@ -1115,18 +1115,22 @@ if __name__ == "__main__":
 		smlesion_overlap_nii = nilearn.image.new_img_like(h, 1.0*m)
 		smlesion_overlap_nii.to_filename('images/smlesion_overlap.nii.gz')
 
-		diff_nii = 1*(mmlesion_overlap_nii.get_fdata()>0) - 1*(smlesion_overlap_nii.get_fdata()>0)
+		diff_nii = 1.0*(mmlesion_overlap_nii.get_fdata()>0) - 1.0*(smlesion_overlap_nii.get_fdata()>0)
 		diff_nii_img = nilearn.image.new_img_like(h, 1.0*diff_nii)
 		diff_nii_img.to_filename('images/mm_v_sm_overlap.nii.gz')
 
-		mm_unique = nilearn.image.new_img_like(h, 1*(diff_nii ==1))
-		sm_unique = nilearn.image.new_img_like(h, 1*(diff_nii ==-1))
+		mm_unique = nilearn.image.new_img_like(h, 1.0*(diff_nii ==1))
+		sm_unique = nilearn.image.new_img_like(h, 1.0*(diff_nii ==-1))
 
 		return diff_nii_img, mm_unique, sm_unique
 
 	diff_nii_img, mm_unique, sm_unique = plt_MM_SM_lesion_mask(df)
-	### calculate PC vectors for MGH, 7T, NKI, full corr for FC.
-	# use LESYMAP_FCwTha.py
+	mm_unique.to_filename('images/mm_unique.nii.gz')
+
+	### calculate PC vectors
+	### use cal_PC() function in LESYMAP_FCwTha.py
+	#import LESYMAP_FCwTha
+	#LESYMAP_FCwTha.main()
 
 	##### Look at diff in PC between SM and MM lesion sites
 	#rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
@@ -1136,15 +1140,30 @@ if __name__ == "__main__":
 	#rsfc_pc05 = nib.load('images/PC.5.nii.gz')
 
 	#### load PC, ave across subjects and thresholds
-	thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
-	thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
-	thalamus_mask_data = thalamus_mask_data>0
-	thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
-	pc_vectors = np.load('data/MGH_pc_vectors.npy')
-	pcs = np.nanmean(np.nanmean(pc_vectors, axis =2), axis=1)
-	pc_img = masking.unmask(pcs, thalamus_mask)
-	rsfc_pc05 = resample_to_img(pc_img, diff_nii_img, interpolation='nearest')
-	pc_img.to_filename('images/MGH_pc.nii.gz')
+	def load_PC(dset):
+		''' load PC calculations, dset = 'MGH' or 'NKI'''
+		thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+		thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
+		thalamus_mask_data = thalamus_mask_data>0
+		thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
+		fn = 'data/%s_pc_vectors.npy' %dset
+		pc_vectors = np.load(fn)
+		pcs = np.nanmean(np.nanmean(pc_vectors, axis =2), axis=1)
+		pc_img = masking.unmask(pcs, thalamus_mask)
+		rsfc_pc05 = resample_to_img(pc_img, diff_nii_img, interpolation='nearest') #this is the PC variable for kde and point plots
+
+		#because stupid AFNI can't "floor" a colorbar, need to manipuluat the image a bit before writing it out for plotting. Display pc .45 to .65
+		vpc = pcs.copy()
+		vpc = vpc-0.45
+		vpc[vpc<=0] = 0.0001
+		vpc_img = masking.unmask(vpc, thalamus_mask)
+		fn = 'images/%s_pc.nii.gz' %dset
+		vpc_img.to_filename(fn)
+
+		return rsfc_pc05
+
+	rsfc_pc05 = load_PC('NKI')
+	rsfc_pc05 = load_PC('MGH')
 
 	## comile df for kde plot
 	PCs={}
@@ -1169,9 +1188,6 @@ if __name__ == "__main__":
 	sns.kdeplot(x='PC', data=pcdf, hue='#Impairment', common_norm = False, legend = False, fill=True, linewidth=3, alpha = .5, palette=['r', '#0269FE'])
 	fn = '/home/kahwang/RDSS/tmp/MM_SM_kde.pdf'
 	plt.savefig(fn)
-
-	#nilearn.image.new_img_like(rsfc_pc05, (rsfc_pc05.get_fdata()-0.3)*thalamus_mask_data).to_filename('images/PC-.4.nii.gz')
-
 
 	### ### ### Stats model for PC comaparison between SM and MM
 	def write_indiv_subj_PC(df, diff_nii_img):
@@ -1219,7 +1235,7 @@ if __name__ == "__main__":
 
 
 	#### plot comparison between SM and MM PC values
-	avePC_image, pcdf = write_indiv_subj_PC(df, diff_nii_img)
+	_, pcdf = write_indiv_subj_PC(df, diff_nii_img)
 	#fig4 = sns.lineplot(x='Cluster', y='PC', data = pcdf, hue='Subject', alpha = .1, legend=False)
 	#fig4 = sns.pointplot(x="Cluster", y='PC', join=True, hue='Subject', dodge=False, data=pcdf, alpha = .1, legend=False)
 	plt.close()
@@ -1234,7 +1250,7 @@ if __name__ == "__main__":
 	#plt.show()
 
 
-	# does PC correlate with different lesions associate with dff num of tasks?
+	# does PC correlate with different lesions sites associated with different number of tasks?
 	def PC_model(Num_task_mask):
 		rsfc_pc = nib.load('images/RSFC_PC.nii.gz')
 		from nilearn.image import resample_to_img
@@ -1288,87 +1304,91 @@ if __name__ == "__main__":
 	# scipy.stats.mannwhitneyu(pdf.loc[pdf['MM_impaired']>1]['PC'].values, pdf.loc[pdf['MM_impaired']<=1]['PC'].values)
 	#
 
-	################################
-	# Figure 4  LESYMap whiet matter tractography analyses
-	################################
+	###### Nuclei analysis
+	morel = nib.load('images/Thalamus_Morel_consolidated_mask_v3.nii.gz')
+	#diff_nii_img_2mm
+	mm_unique_2mm = resample_to_img(diff_nii_img, morel, interpolation = 'nearest')
+	mm_nuclei_vec = morel.get_fdata()[mm_unique_2mm.get_fdata()==1]
+	#sm_unique_2mm = resample_to_img(sm_unique, morel, interpolation = 'nearest')
+	#sm_nuclei_vec = morel.get_fdata()[sm_unique_2mm.get_fdata()==1]
 
-	#create the overlap of TMTB, COWA, BNT, Complex_Figure_Recall lesion masks
-	TMTB_mask = nib.load("images/TMTB_lesionmask_pcount.nii.gz")
-	COWA_mask = nib.load("images/COWA_lesionmask_pcount.nii.gz")
-	BNT_mask = nib.load("images/BNT_lesionmask_pcount.nii.gz")
-	COM_Recall_mask = nib.load("images/Complex_Figure_Delayed_Recall_lesionmask_pcount.nii.gz")
-
-	four_task_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(COWA_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
-	four_task_overlap.to_filename('images/four_tasks_lesionmask_overlap.nii.gz')
-	TMTB_COWA_BNT_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(COWA_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0))
-	TMTB_COWA_BNT_overlap.to_filename('images/TMTB_COWA_BNT_lesionmask_overlap.nii.gz')
-	TMTB_COWA_COM_Recall_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(COWA_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
-	TMTB_COWA_COM_Recall_overlap.to_filename('images/TMTB_COWA_COM_Recall_lesionmask_overlap.nii.gz')
-	TMTB_BNT_COM_Recall_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(TMTB_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
-	TMTB_BNT_COM_Recall_overlap.to_filename('images/TMTB_BNT_COM_Recall_lesionmask_overlap.nii.gz')
-	COWA_BNT_COM_Reacall_overlap = nilearn.image.new_img_like(TMTB_mask, 1*(COWA_mask.get_fdata()>0) + 1*(BNT_mask.get_fdata()>0) + 1*(COM_Recall_mask.get_fdata()>0))
-	COWA_BNT_COM_Reacall_overlap.to_filename('images/COWA_BNT_COM_Reacall_lesionmask_overlap.nii.gz')
-
-
-	#create the overlap of TMTB, COWA, BNT, Complex_Figure_Recall WM density maps
-	TMTB_wm_endpoint = nib.load("images/lesymaps/WMtracks/TMTB_endpoint.nii.gz")
-	COWA_wm_endpoint = nib.load("images/lesymaps/WMtracks/COWA_endpoint.nii.gz")
-	BNT_wm_endpoint = nib.load("images/lesymaps/WMtracks/BNT_endpoint.nii.gz")
-	COM_Recall_wm_endpoint = nib.load("images/lesymaps/WMtracks/COM_Recall_endpoint.nii.gz")
-
-	four_task_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
-	four_task_WM_overlap.to_filename('images/four_task_WM_overlap.nii.gz')
-	TMTB_COWA_BNT_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0))
-	TMTB_COWA_BNT_WM_overlap.to_filename('images/TMTB_COWA_BNT_WM_overlap.nii.gz')
-	TMTB_COWA_COM_Recall_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
-	TMTB_COWA_COM_Recall_WM_overlap.to_filename('images/TMTB_COWA_COM_Recall_WM_overlap.nii.gz')
-	TMTB_BNT_COM_Recall_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(TMTB_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
-	TMTB_BNT_COM_Recall_WM_overlap.to_filename('images/TMTB_BNT_COM_Recall_WM_overlap.nii.gz')
-	COWA_BNT_COM_Reacall_WM_overlap = nilearn.image.new_img_like(TMTB_wm_endpoint, 1*(COWA_wm_endpoint.get_fdata()>0) + 1*(BNT_wm_endpoint.get_fdata()>0) + 1*(COM_Recall_wm_endpoint.get_fdata()>0))
-	COWA_BNT_COM_Reacall_WM_overlap.to_filename('images/COWA_BNT_COM_Reacall_WM_overlap.nii.gz')
-
-	WM_overlaps = [four_task_WM_overlap, TMTB_COWA_BNT_WM_overlap, TMTB_COWA_COM_Recall_WM_overlap, TMTB_BNT_COM_Recall_WM_overlap, COWA_BNT_COM_Reacall_WM_overlap]
-	lesion_overlaps = [four_task_overlap, TMTB_COWA_BNT_overlap, TMTB_COWA_COM_Recall_overlap, TMTB_BNT_COM_Recall_overlap, COWA_BNT_COM_Reacall_overlap]
-	# Compare to number of overlapping WM end point voxels inside and outside overlapping lesion masks
-
-	for i in [0,1,2,3,4]:
-		thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
-		wm_density = resample_to_img(WM_overlaps[i], thalamus_mask, interpolation = 'nearest')
-		lesion_mask = resample_to_img(lesion_overlaps[i], thalamus_mask, interpolation = 'nearest')
-
-		if i == 0:
-			wm_density_data = 1*(wm_density.get_fdata()==4) * 1*(thalamus_mask.get_fdata()>0)
-			lesion_mask_data = 1*(lesion_mask.get_fdata()==4) * 1*(thalamus_mask.get_fdata()>0)
-		elif i > 0:
-			wm_density_data = 1*(wm_density.get_fdata()==3) * 1*(thalamus_mask.get_fdata()>0)
-			lesion_mask_data = 1*(lesion_mask.get_fdata()==3) * 1*(thalamus_mask.get_fdata()>0)
-		outside_lesion_mask_data = 1*(lesion_mask.get_fdata()==0) * 1*(thalamus_mask.get_fdata()>0)
-
-		wdf = pd.DataFrame()
-		wdf.loc[0, 'Location'] ='Inside \noverlapping zone'
-		print("in mask:")
-		print(np.sum(wm_density_data[lesion_mask_data==1]))
-		wdf.loc[0, 'Endpoint voxel count'] = np.sum(wm_density_data[lesion_mask_data==1])
-		print("outside mask:")
-		wdf.loc[1, 'Location'] ='Outside \noverlapping zone'
-		print(np.sum(wm_density_data[outside_lesion_mask_data==1]))
-		wdf.loc[1, 'Endpoint voxel count'] = np.sum(wm_density_data[outside_lesion_mask_data==1])
-		plt.figure(figsize=[3,3])
-		figw = sns.barplot(x="Location", y="Endpoint voxel count", data=wdf)
-		plt.tight_layout()
-		figw.set_ylim([0, 30])
-		#plt.show()
-		fn = '/home/kahwang/RDSS/tmp/wmdensity_bar_%s.png' %i
-		plt.savefig(fn)
+	morel_list={
+	'1': 'AN',
+	'2':'VM',
+	'3':'VL',
+	'4':'MGN',
+	'5':'MD',
+	'6':'PuA',
+	'7':'LP',
+	'8':'IL',
+	'9':'VA',
+	'10':'Po',
+	'11':'LGN',
+	'12':'PuM',
+	'13':'PuI',
+	'14':'PuL',
+	'17':'VP'}
 
 
-	# find patients
-	# No patients with 3 common impairments among these tasks...
-	# df.loc[(df['TMTB_z_Impaired'] == True) & (df['COWA_z_Impaired'] == True)]
-	#df.loc[(df['BNT_z_Impaired'] == True) & (df['COWA_z_Impaired'] == True)]
-	#df.loc[(df['BNT_z_Impaired'] == True) & (df['TMTB_z_Impaired'] == True)]
-	#df.loc[(df['TMTB_z_Impaired'] == True) & (df['Complex_Figure_Delayed_Recall_z_Impaired'] == True)]
-	#df.loc[(df['BNT_z_Impaired'] == True) & (df['Complex_Figure_Delayed_Recall_z_Impaired'] == True)]
-	#df.loc[(df['COWA_z_Impaired'] == True) & (df['Complex_Figure_Delayed_Recall_z_Impaired'] == True)]
+	ndf = pd.DataFrame()
+	for i, n in enumerate(np.unique(mm_nuclei_vec)):
+		ndf.loc[i, 'Size (ml)'] = np.sum(mm_nuclei_vec == n)*8
+		ndf.loc[i, 'Nuclei'] = morel_list[str(int(n))]
+
+	# ndf = pd.DataFrame()
+	# for i, n in enumerate(np.unique(sm_nuclei_vec)):
+	# 	ndf.loc[i, 'Size'] = np.sum(sm_nuclei_vec == n)*8
+	# 	ndf.loc[i, 'Nuclei'] = morel_list[str(int(n))]
+
+	yeo = nib.load('1000subjects_TightThalamus_clusters007_ref.nii.gz')
+	yeo_vec = yeo.get_fdata()[mm_unique_2mm.get_fdata()==1]
+	plt.close()
+	sns.set_context("paper")
+	plt.figure(figsize=[4,4])
+	fign = sns.barplot(x="Nuclei", y="Size (ml)", data=ndf)
+	plt.tight_layout()
+	#figw.set_ylim([0, 30])
+	#plt.show()
+	fn = '/home/kahwang/RDSS/tmp/modrel_bar.pdf'
+	plt.savefig(fn)
+	#plt.show()
+
+
+	##### FC weight analysis
+	Schaeffer_CI = np.loadtxt('/home/kahwang/bin/LesionNetwork/Schaeffer400_7network_CI')
+	fc = np.load('data/NKI_mmmask_fc_fcorr.npy')
+	fc = np.mean(fc, axis=2)
+	zfc = zscore(fc, axis=1)
+	fndf = pd.DataFrame()
+	Networks = ['V', 'SM', 'DA', 'CO', 'Lm', 'FP', 'DF']
+	for i, ci in enumerate([1,2,3,4,5,6,7]):
+		fndf.loc[i, 'FC (z-score'] = np.mean(zfc[:,Schaeffer_CI==ci])
+		fndf.loc[i, 'Network'] = Networks[i]
+
+
+	vfdf = pd.DataFrame()
+	fc[fc<0] = 0
+
+	fc_total = 0
+	for ci in [1,2,3,4,5,6,7]:
+		fc_total = fc_total + np.mean(fc[:,Schaeffer_CI==ci], axis=1)
+
+	i = 0
+	for ic, ci in enumerate([1,2,3,4,5,6,7]):
+		for v in np.arange(0, fc.shape[0]):
+			vfdf.loc[i, 'FC weight ratio'] = np.mean(fc[v,Schaeffer_CI==ci]) / fc_total[v]
+			vfdf.loc[i, 'Network'] = Networks[ic]
+			i=i+1
+
+	plt.close()
+	sns.set_context("paper")
+	plt.figure(figsize=[4.2,4])
+	sns.kdeplot(x='FC weight ratio', data=vfdf, hue='Network', common_norm = True, legend = True, fill=False, linewidth=2, alpha = .5, palette=['#9856A7', '#7F9ABD', '#589741', '#D16CF7', '#F7F45F', '#E7BC5A', '#CB777F'])
+	#sns.histplot(data=vfdf, x="FC weight ratio", hue='Network')
+	#plt.show()
+	plt.tight_layout()
+	fn = '/home/kahwang/RDSS/tmp/MM_FC_kde.pdf'
+	plt.savefig(fn)
+
 
 #end of line
