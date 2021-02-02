@@ -1,7 +1,5 @@
 from ThaHub import *
 from nilearn.input_data import NiftiLabelsMasker
-
-
 ################################
 ## Calculate thalamocortical FC and thalamic vox by vox PC
 ################################
@@ -108,6 +106,7 @@ def pcorr_subcortico_cortical_connectivity(subcortical_ts, cortical_ts):
 	return pcorr_mat
 
 
+### global variables, masks, files, etc.
 # load files
 MGH_fn = '/home/kahwang/bsh/MGH/MGH/*/MNINonLinear/rfMRI_REST_ncsreg.nii.gz'
 MGH_files = glob.glob(MGH_fn)
@@ -122,54 +121,106 @@ thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Mo
 thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
 thalamus_mask_data = thalamus_mask_data>0
 thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
+mm_unique = nib.load('images/mm_unique.nii.gz')
+mm_unique_2mm = resample_to_img(mm_unique, thalamus_mask, interpolation = 'nearest')
 Schaefer400_mask = nib.load('/home/kahwang/bsh/ROIs/Schaefer400_7network_2mm.nii.gz')
 cortex_masker = NiftiLabelsMasker(labels_img='/home/kahwang/bsh/ROIs/Schaefer400_7network_2mm.nii.gz', standardize=False)
 Schaeffer_CI = np.loadtxt('/home/kahwang/bin/LesionNetwork/Schaeffer400_7network_CI')
 
-for i, files in enumerate(datafiles):
 
-    thresholds = [90,91,92,93,94,95,96,97,98]
-    pc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(files), len(thresholds)))
+def cal_PC():
+    '''Calculate PC values '''
+    for i, files in enumerate(datafiles):
 
-    for ix, f in enumerate(files):
-        functional_data = nib.load(f)
-        #extract cortical ts from schaeffer 400 ROIs
-        cortex_ts = cortex_masker.fit_transform(functional_data)
-        #time by ROI
-        #cortex_ts = cortex_ts.T
-        #extract thalamus vox by vox ts
-        thalamus_ts = masking.apply_mask(functional_data, thalamus_mask)
-        # time by vox
-        #thalamus_ts = thalamus_ts.T
+        thresholds = [90,91,92,93,94,95,96,97,98]
 
-        # concate, cortex + thalamus voxel, dimesnion should be 2627 (400 cortical ROIs plus 2227 thalamus voxel from morel atlas)
-        # work on partial corr.
-        ts = np.concatenate((cortex_ts, thalamus_ts), axis=1)
-        corrmat = np.corrcoef(ts.T)
-        pmat = pcorr_subcortico_cortical_connectivity(thalamus_ts, cortex_ts)
-        thalamocortical_fc = pmat[400:, 0:400]
-        #extrat the thalamus by cortex FC matrix
+        # saving both patial corr and full corr
+        fpc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(files), len(thresholds)))
+        ppc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(files), len(thresholds)))
+        pc_vectors = [ppc_vectors, fpc_vectors]
 
-        # fc marices
-        #thalamocortical_fc = generate_correlation_mat(thalamus_ts, cortex_ts)
-        #fcmats.append(thalamocortical_fc)
-        #calculate PC with the extracted thalamocortical FC matrix
+        for ix, f in enumerate(files):
+            functional_data = nib.load(f)
+            #extract cortical ts from schaeffer 400 ROIs
+            cortex_ts = cortex_masker.fit_transform(functional_data)
+            #time by ROI
+            #cortex_ts = cortex_ts.T
+            #extract thalamus vox by vox ts
+            thalamus_ts = masking.apply_mask(functional_data, thalamus_mask)
+            # time by vox
+            #thalamus_ts = thalamus_ts.T
 
-        #loop through threshold
-        for it, t in enumerate(thresholds):
-            temp_mat = thalamocortical_fc.copy()
-            temp_mat[temp_mat<np.percentile(temp_mat, t)] = 0
-            fc_sum = np.sum(temp_mat, axis=1)
-            kis = np.zeros(np.shape(fc_sum))
+            # concate, cortex + thalamus voxel, dimesnion should be 2627 (400 cortical ROIs plus 2227 thalamus voxel from morel atlas)
+            # work on partial corr.
+            #ts = np.concatenate((cortex_ts, thalamus_ts), axis=1)
+            #corrmat = np.corrcoef(ts.T)
+            pmat = pcorr_subcortico_cortical_connectivity(thalamus_ts, cortex_ts)
+            thalamocortical_pfc = pmat[400:, 0:400]
+            #extrat the thalamus by cortex FC matrix
 
-            for ci in np.unique(Schaeffer_CI):
-                kis = kis + np.square(np.sum(temp_mat[:,np.where(Schaeffer_CI==ci)[0]], axis=1) / fc_sum)
+            # fc marices
+            thalamocortical_ffc = generate_correlation_mat(thalamus_ts.T, cortex_ts.T)
+            #fcmats.append(thalamocortical_fc)
+            #calculate PC with the extracted thalamocortical FC matrix
 
-            pc_vectors[:,ix, it] = 1-kis
+            #loop through threshold
+            FCmats = [thalamocortical_pfc, thalamocortical_ffc]
+
+            for j, thalamocortical_fc in enumerate(FCmats):
+                for it, t in enumerate(thresholds):
+                    temp_mat = thalamocortical_fc.copy()
+                    temp_mat[temp_mat<np.percentile(temp_mat, t)] = 0
+                    fc_sum = np.sum(temp_mat, axis=1)
+                    kis = np.zeros(np.shape(fc_sum))
+
+                    for ci in np.unique(Schaeffer_CI):
+                        kis = kis + np.square(np.sum(temp_mat[:,np.where(Schaeffer_CI==ci)[0]], axis=1) / fc_sum)
+
+                    pc_vectors[j][:,ix, it] = 1-kis
+
+        fn = "data/%s_pc_vectors_pcorr" %datasets[i]
+        np.save(fn, pc_vectors[0])
+        fn = "data/%s_pc_vectors_corr" %datasets[i]
+        np.save(fn, pc_vectors[1])
+
+def cal_mmmask_FC():
+    ''' calculate FC between corticla ROIs and thalamic mask of multitask impairment()'''
+
+    for i, files in enumerate(datafiles):
+        # save both pcorr and full corr
+        fcpmat = np.zeros((np.count_nonzero(mm_unique_2mm.get_fdata()>0),400, len(files)))
+        fcmat = np.zeros((np.count_nonzero(mm_unique_2mm.get_fdata()>0),400, len(files)))
+
+        for ix, f in enumerate(files):
+            functional_data = nib.load(f)
+            #extract cortical ts from schaeffer 400 ROIs
+            cortex_ts = cortex_masker.fit_transform(functional_data)
+            #time by ROI
+            #cortex_ts = cortex_ts.T
+            #extract thalamus vox by vox ts
+            thalamus_ts = masking.apply_mask(functional_data, mm_unique_2mm)
+            # time by vox
+            #thalamus_ts = thalamus_ts.T
+            pmat = pcorr_subcortico_cortical_connectivity(thalamus_ts, cortex_ts)
+            fcpmat[:,:,ix] = pmat[400:, 0:400]
+            fcmat[:,:,ix] = generate_correlation_mat(thalamus_ts.T, cortex_ts.T)
 
 
-    fn = "data/%s_pc_vectors_pcorr" %datasets[i]
-    np.save(fn, pc_vectors)
+        fn = "data/%s_mmmask_fc_pcorr" %datasets[i]
+        np.save(fn, fcpmat)
+        fn = "data/%s_mmmask_fc_fcorr" %datasets[i]
+        np.save(fn, fcmat)
+
+
+
+if __name__ == "__main__":
+
+    cal_PC()
+    #cal_mmmask_FC()
+
+
+
+
 
 
 
