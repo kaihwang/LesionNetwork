@@ -896,6 +896,10 @@ if __name__ == "__main__":
 	print('Complex_Figure_Copy_Comparison')
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx') & (df['Complex_Figure_Copy_Comparison']==True)]['Complex_Figure_Copy_z'].values, df.loc[df['Site']=='Th']['Complex_Figure_Copy_z'].values))
 
+	# lesion size and demographics
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['Lesion Size'].values, df.loc[df['Site']=='Th']['Lesion Size'].values))
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['Age'].values, df.loc[df['Site']=='Th']['Age'].values))
+
 
 	#plot_neuropsy_indiv_comparisons()
 	#plot_neuropsy_comparisons()
@@ -914,7 +918,7 @@ if __name__ == "__main__":
 
 
 	################################
-	# Supplemental FigureX.  Correlation among scores
+	# Supplemental Figure 2.  Correlation among scores
 	################################
 
 	#create cross correlation table, and do clustering to find clusters of test variables
@@ -1146,7 +1150,7 @@ if __name__ == "__main__":
 		thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
 		thalamus_mask_data = thalamus_mask_data>0
 		thalamus_mask = nilearn.image.new_img_like(thalamus_mask, thalamus_mask_data)
-		fn = 'data/%s_pc_vectors.npy' %dset
+		fn = 'data/%s_pc_vectors_corr.npy' %dset
 		pc_vectors = np.load(fn)
 		pcs = np.nanmean(np.nanmean(pc_vectors, axis =2), axis=1)
 		pc_img = masking.unmask(pcs, thalamus_mask)
@@ -1163,7 +1167,7 @@ if __name__ == "__main__":
 		return rsfc_pc05
 
 	rsfc_pc05 = load_PC('NKI')
-	rsfc_pc05 = load_PC('MGH')
+	#rsfc_pc05 = load_PC('MGH')
 
 	## comile df for kde plot
 	PCs={}
@@ -1180,19 +1184,23 @@ if __name__ == "__main__":
 		pdf['#Impairment'] = t
 
 		pcdf =pd.concat([pcdf, pdf])
+	A=pcdf.loc[pcdf['#Impairment']=='MM']['PC']
+	B=pcdf.loc[pcdf['#Impairment']=='SM']['PC']
+	scipy.stats.ks_2samp(A,B)
 
 	#kde plot
 	plt.close()
 	sns.set_context("paper")
-	plt.figure(figsize=[4,4])
+	plt.figure(figsize=[4,3])
 	sns.kdeplot(x='PC', data=pcdf, hue='#Impairment', common_norm = False, legend = False, fill=True, linewidth=3, alpha = .5, palette=['r', '#0269FE'])
 	fn = '/home/kahwang/RDSS/tmp/MM_SM_kde.pdf'
 	plt.savefig(fn)
 
 	### ### ### Stats model for PC comaparison between SM and MM
-	def write_indiv_subj_PC(df, diff_nii_img):
+	def write_indiv_subj_PC(df, diff_nii_img, dset):
 		#load PC vectors and tha mask to put voxel values back to nii object
-		pc_vectors = np.load('data/MGH_pc_vectors.npy') #resting state FC's PC. dimension 236 (sub) by 2xxx (tha voxel)
+		fn = 'data/%s_pc_vectors_corr.npy' %(dset)
+		pc_vectors = np.load(fn) #resting state FC's PC. dimension 236 (sub) by 2xxx (tha voxel)
 		thalamus_mask = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz')
 		thalamus_mask_data = nib.load('/data/backed_up/kahwang/Tha_Neuropsych/ROI/Thalamus_Morel_consolidated_mask_v3.nii.gz').get_fdata()
 		thalamus_mask_data = thalamus_mask_data>0
@@ -1235,11 +1243,16 @@ if __name__ == "__main__":
 
 
 	#### plot comparison between SM and MM PC values
-	_, pcdf = write_indiv_subj_PC(df, diff_nii_img)
+	_, pcdf = write_indiv_subj_PC(df, diff_nii_img, 'NKI')
+
+	#ttest
+	print(stats.ttest_rel(pcdf.loc[pcdf['Cluster']==-1]['PC'], pcdf.loc[pcdf['Cluster']==1]['PC']))
+	print(pcdf.groupby(['Cluster']).mean())
+
 	#fig4 = sns.lineplot(x='Cluster', y='PC', data = pcdf, hue='Subject', alpha = .1, legend=False)
 	#fig4 = sns.pointplot(x="Cluster", y='PC', join=True, hue='Subject', dodge=False, data=pcdf, alpha = .1, legend=False)
 	plt.close()
-	plt.figure(figsize=[4,4])
+	plt.figure(figsize=[4,3])
 	fig4 = sns.pointplot(x="Cluster", y='PC', join=False, dodge=False, data=pcdf, hue='Cluster', palette=['#0269FE', 'r'])
 	fig4 = sns.stripplot(x="Cluster", y="PC",
 					  data=pcdf, dodge=False, jitter = False, alpha=.03, palette=['#0269FE', 'r'])
@@ -1332,7 +1345,7 @@ if __name__ == "__main__":
 
 	ndf = pd.DataFrame()
 	for i, n in enumerate(np.unique(mm_nuclei_vec)):
-		ndf.loc[i, 'Size (ml)'] = np.sum(mm_nuclei_vec == n)*8
+		ndf.loc[i, 'Percentage overlap'] = (np.sum(mm_nuclei_vec == n)*8 / np.sum(8.0*(morel.get_fdata()==n))) * 100
 		ndf.loc[i, 'Nuclei'] = morel_list[str(int(n))]
 
 	# ndf = pd.DataFrame()
@@ -1345,7 +1358,7 @@ if __name__ == "__main__":
 	plt.close()
 	sns.set_context("paper")
 	plt.figure(figsize=[4,4])
-	fign = sns.barplot(x="Nuclei", y="Size (ml)", data=ndf)
+	fign = sns.barplot(x="Nuclei", y="Percentage overlap", data=ndf)
 	plt.tight_layout()
 	#figw.set_ylim([0, 30])
 	#plt.show()
