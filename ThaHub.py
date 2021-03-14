@@ -922,16 +922,19 @@ if __name__ == "__main__":
 	################################
 
 	#create cross correlation table, and do clustering to find clusters of test variables
-	# cdf = df.loc[df['Site']=='ctx']
-	#
-	# ### collect data on each task
-    # #'Complex_Figure_Copy',
-	# #'Complex_Figure_Recall'
-	#
-	# list_of_neuropsych_z = ['TMTA', 'TMTB', 'BNT', 'COWA', 'RAVLT_Learning', 'RAVLT_Immediate_Recall', 'RAVLT_Delayed_Recall', 'RAVLT_Recognition', 'Complex_Figure_Copy']  #
-	# crdf = pd.DataFrame()
-	# for neuropsych in list_of_neuropsych_z:
-	# 	crdf = pd.concat([crdf, cdf[neuropsych+'_z']], axis=1)
+	cdf = df.loc[df['Site']=='ctx']
+
+	### collect data on each task
+    #'Complex_Figure_Copy',
+	#'Complex_Figure_Recall'
+
+	list_of_neuropsych_z = ['TMTA', 'TMTB', 'BNT', 'COWA', 'RAVLT_Immediate_Recall', 'RAVLT_Learning', 'RAVLT_Delayed_Recall', 'RAVLT_Recognition', 'Complex_Figure_Copy', 'Complex_Figure_Delayed_Recall']  #
+	crdf = pd.DataFrame()
+	for neuropsych in list_of_neuropsych_z:
+		crdf = pd.concat([crdf, cdf[neuropsych+'_z']], axis=1)
+	crdf['TMTA_z'] = crdf['TMTA_z'] * -1
+	crdf['TMTB_z'] = crdf['TMTB_z'] * -1
+	crdf.corr().to_csv('~/RDSS/tmp/crosscorr.csv')
 	# # invert TMT
 	# #crdf['TMTA_z'] = crdf['TMTA_z'] * -1
 	# #crdf['TMTB_z'] = crdf['TMTB_z'] * -1
@@ -958,13 +961,14 @@ if __name__ == "__main__":
 
 	def plot_corr_table(mat):
 		corrdf = pd.read_csv('~/RDSS/tmp/crosscorr.csv')
-		corrdf = corrdf.set_index('Tasks')
-		corrplot = sns.heatmap(corrdf, vmin = -1, vmax=1, center=0, cmap="coolwarm")
-		corrplot.set_xticklabels(['Lesion Size', 'TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
-		'RAVLT Recall', 'RAVLT Recognition',  'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
+		corrdf = corrdf.set_index('Unnamed: 0')
+		plt.figure(figsize=[8,8])
+		corrplot = sns.heatmap(corrdf, vmin = -1, vmax=1, center=0, cmap="coolwarm", annot=False)
+		corrplot.set_xticklabels(['TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
+		'RAVLT Immediate Learning', 'RAVLT Learning', 'RAVLT Recall', 'RAVLT Recognition',
 		'Complex Figure Copy', 'Comeplex Figure Recall'], rotation=90)
-		corrplot.set_yticklabels(['Lesion Size', 'TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
-		'RAVLT Recall', 'RAVLT Recognition',  'RAVLT Trial 1', 'RAVLT Trial 2', 'RAVLT Trial 3', 'RAVLT Trial 4', 'RAVLT Trial 5',
+		corrplot.set_yticklabels(['TMT Part A','TMT Part B', 'Boston Naming', 'COWA',
+		'RAVLT Immediate Learning', 'RAVLT Learning', 'RAVLT Recall', 'RAVLT Recognition',
 		'Complex Figure Copy', 'Comeplex Figure Recall'])
 		plt.xlabel('')
 		plt.ylabel('')

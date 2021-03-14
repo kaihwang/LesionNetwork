@@ -132,7 +132,7 @@ def cal_PC():
     '''Calculate PC values '''
     for i, files in enumerate(datafiles):
 
-        thresholds = [90,91,92,93,94,95,96,97,98]
+        thresholds = [95,96,97,98,99]
 
         # saving both patial corr and full corr
         fpc_vectors = np.zeros((np.count_nonzero(thalamus_mask_data>0),len(files), len(thresholds)))
