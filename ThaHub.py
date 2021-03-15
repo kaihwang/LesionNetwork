@@ -899,7 +899,8 @@ if __name__ == "__main__":
 	# lesion size and demographics
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['Lesion Size'].values, df.loc[df['Site']=='Th']['Lesion Size'].values))
 	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['Age'].values, df.loc[df['Site']=='Th']['Age'].values))
-
+	#df['MM_impaired']
+	print(scipy.stats.mannwhitneyu(df.loc[(df['Site']=='ctx')]['MM_impaired'].values, df.loc[df['Site']=='Th']['MM_impaired'].values))
 
 	#plot_neuropsy_indiv_comparisons()
 	#plot_neuropsy_comparisons()
