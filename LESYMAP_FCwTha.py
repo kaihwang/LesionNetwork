@@ -184,7 +184,7 @@ def cal_PC():
         np.save(fn, pc_vectors[1])
 
 def cal_mmmask_FC():
-    ''' calculate FC between corticla ROIs and thalamic mask of multitask impairment()'''
+    ''' calculate FC between cortical ROIs and thalamic mask of multitask impairment()'''
 
     for i, files in enumerate(datafiles):
         # save both pcorr and full corr
